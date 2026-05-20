@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom'
 import Footer from '../components/footer/Footer'
-import ToggleDarkMode from '../components/toggle-dark-mode/ToggleDarkMode'
 import NavBar from '../components/public-components/NavBar'
 
 
