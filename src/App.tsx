@@ -1,9 +1,10 @@
 
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import AuthLayout from './layouts/auth-layout'
-import PublicLayout from './layouts/public-layout'
-import MainLayout from './layouts/main-layout'
+import AuthLayout from './layouts/AuthLayout'
+import PublicLayout from './layouts/PublicLayout'
+import MainLayout from './layouts/MainLayout'
+import { HomePage } from './pages/home/HomePage'
 
 function App() {
   
@@ -18,8 +19,8 @@ function App() {
     </Route>
 
     <Route element = {<PublicLayout />}>
-      <Route path = "/" element = {<h1>Public page</h1>} />
-      <Route path = "/home" element = {<h1>Public page</h1>} />
+      <Route path = "/" element = {<HomePage />} />
+      <Route path = "/home" element = {<HomePage />} />
     </Route>
 
     <Route element = {<MainLayout />}>
