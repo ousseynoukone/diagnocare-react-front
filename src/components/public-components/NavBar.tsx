@@ -17,7 +17,7 @@ export default function NavBar() {
         </a>
 
 
-        <div className="flex items-center gap-3 hidden md:flex">
+        <div className="flex items-center gap-3 hidden lg:flex">
           <a href="/services" className="text-sm font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
             Comment ça marche ?
           </a>
@@ -42,7 +42,7 @@ export default function NavBar() {
           <ToggleDarkMode />
         </div>
 
-        <div className="md:hidden  top-4 right-4">
+        <div className="lg:hidden  top-4 right-4">
           <button
           onClick={()=>setIsMenuOpen(!isMenuOpen)}     
           
@@ -56,7 +56,7 @@ export default function NavBar() {
       </div>
 
       {/* Side Menu */}
-      <div className={`fixed inset-0 z-50 md:hidden ${isMenuOpen ? 'visible' : 'invisible'}`}>
+      <div className={`fixed inset-0 z-50 lg:hidden ${isMenuOpen ? 'visible' : 'invisible'}`}>
 
         {/* Overlay (fond noir semi-transparent) */}
         <div 
