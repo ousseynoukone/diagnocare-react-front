@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import heroImg from '../../assets/hero.png'
+import heroImg from '../../assets/doctor.png'
 import fastImg from '../../assets/fast.png'
 import signalImg from '../../assets/signal.png'
 import fileImg from '../../assets/file.png'
@@ -17,21 +17,20 @@ export function HomePage() {
     <div className="space-y-24">
       <section className="overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-3 rounded-full bg-sky-100 px-4 py-2 text-sm text-sky-700 ring-1 ring-slate-900/10 dark:bg-white/10 dark:text-sky-200 dark:ring-slate-100/10">
-                <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
-                Technologie médicale avancée
-              </div>
-              <div className="space-y-6">
-                <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-                  Votre santé, éclairée par l'intelligence artificielle
+          <div className="mx-auto max-w-2xl lg:max-w-none">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="flex flex-col items-center space-y-6">
+                <div className='rounded-full m-2 bg-slate-200 p-2 w-24 h-24 mx-auto flex items-center justify-center dark:bg-slate-800'>
+                  <img src={heroImg} alt="DiagnoCare illustration" className="h-14 w-14 object-contain" />
+                </div>
+                <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl max-w-3xl">
+                  Votre santé, <span className='text-primary'> éclairée par l'intelligence artificielle</span> 
                 </h1>
-                <p className="max-w-2xl text-base leading-8 text-slate-700 dark:text-slate-300 sm:text-lg">
+                <p className="max-w-2xl text-base leading-8 text-slate-700 dark:text-slate-300 sm:text-lg mx-auto">
                   Une analyse de symptômes rapide, précise et confidentielle pour vous guider vers les bons soins. Technologie médicale avancée, interface simplifiée pour tous.
                 </p>
               </div>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
                 <a
                   href="/login"
                   className="inline-flex justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-sky-500"
@@ -47,11 +46,6 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="relative mx-auto max-w-xl overflow-hidden rounded-[2.5rem] bg-slate-100 p-8 shadow-2xl shadow-slate-200/50 ring-1 ring-slate-200/40 transition dark:bg-slate-950 dark:shadow-slate-950/40 dark:ring-slate-700/50 sm:p-10">
-              <div className="absolute -left-8 top-8 h-28 w-28 rounded-full bg-sky-500/20 blur-3xl" />
-              <div className="absolute -right-10 bottom-10 h-32 w-32 rounded-full bg-indigo-500/15 blur-3xl" />
-              <img src={heroImg} alt="DiagnoCare illustration" className="relative mx-auto h-[360px] w-full object-contain" />
-            </div>
           </div>
         </div>
       </section>
