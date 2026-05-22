@@ -22,6 +22,6 @@ export const faqItems = [
   {
     question: "Combien ça coûte ?",
     answer:
-      "L’application propose une version de base gratuite et des options premium pour un accompagnement renforcé.",
+      "L’application propose une version de base 100% gratuite , il n'est pas a écarter l'avénement de fonctionnalités premium cependant .",
   },
 ]

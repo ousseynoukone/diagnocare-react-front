@@ -2,6 +2,7 @@ import logo from '../../assets/logo-blue.png';
 import ToggleDarkMode from '../toggle-dark-mode/ToggleDarkMode';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,21 +12,21 @@ export default function NavBar() {
       <div className="mx-auto max-w-8xl px-2 py-2 sm:px-6 lg:px-8 flex items-center justify-between">
 
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2 text-background-900 dark:text-background-50">
+        <Link to="/" className="flex items-center gap-2 text-background-900 dark:text-background-550">
           <img src={logo} alt="DiagnoCare Logo" className="h-12 w-auto translate-y-1.5" />
           <span className="text-xl font-bold">DiagnoCare</span>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="items-center gap-3 hidden lg:flex">
           <a
-            href="/services"
+            href="#how-it-works"
             className="text-sm font-medium text-background-600 hover:text-background-900 dark:text-background-300 dark:hover:text-background-50 transition-colors"
           >
             Comment ça marche ?
           </a>
           <a
-            href="/contact"
+            href="#faq"
             className="text-sm font-medium text-background-600 hover:text-background-900 dark:text-background-300 dark:hover:text-background-50 transition-colors"
           >
             FAQ
@@ -33,19 +34,19 @@ export default function NavBar() {
 
           <div className="h-10 w-0.5 bg-background-200 dark:bg-background-700 mx-2"></div>
 
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="rounded-full border border-background-300 dark:border-background-600 px-4 py-2 text-sm font-medium text-background-700 dark:text-background-200 hover:bg-background-100 dark:hover:bg-background-800 transition-colors"
           >
             Se connecter
-          </a>
+          </Link>
 
-          <a
-            href="/signup"
+          <Link
+            to="/signup"
             className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:bg-primary dark:hover:bg-primary-700 transition-colors"
           >
             Commencer
-          </a>
+          </Link>
 
           <ToggleDarkMode />
         </div>
@@ -87,14 +88,14 @@ export default function NavBar() {
             {isMenuOpen && (
               <div>
                 <a
-                  href="/services"
+                  href="#how-it-works"
                   className="block px-4 my-1 py-2 text-background-700 dark:text-background-300 hover:bg-background-100 dark:hover:bg-background-800 rounded-lg transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Comment ça marche ?
                 </a>
                 <a
-                  href="/contact"
+                  href="#faq"
                   className="block px-4 my-1 py-2 text-background-700 dark:text-background-300 hover:bg-background-100 dark:hover:bg-background-800 rounded-lg transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -102,21 +103,21 @@ export default function NavBar() {
                 </a>
 
                 <div className="px-4 pt-4 border-t border-background-200 dark:border-background-700 flex flex-col gap-3">
-                  <a
-                    href="/login"
+                  <Link
+                    to="/login"
                     className="w-full text-center rounded-full border border-background-300 dark:border-background-600 px-5 py-3 text-sm font-medium text-background-700 dark:text-background-200 hover:bg-background-100 dark:hover:bg-background-800 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Se connecter
-                  </a>
+                  </Link>
 
-                  <a
-                    href="/signup"
+                  <Link
+                    to="/signup"
                     className="w-full text-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-white hover:bg-primary-700 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Commencer
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}

@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "how_it_works": "How it works",
+    "faq": "FAQ",
+    "login": "Login",
+    "start": "Get Started"
+  },
+  "hero": {
+    "title": "Your health,",
+    "title_highlight": " enlightened by artificial intelligence",
+    "description": "A fast, accurate, and confidential symptom analysis to guide you to the right care. Advanced medical technology, simplified interface for everyone.",
+    "start_button": "Start an evaluation",
+    "learn_more": "Learn more"
+  },
+  "features": {
+    "category": "Why choose DiagnoCare?",
+    "title": "A rigorous medical approach combined with the power of AI.",
+    "analysis": {
+      "title": "Intelligent Analysis",
+      "description": "Our algorithms are trained on millions of validated clinical cases to offer maximum accuracy in identifying pathologies."
+    },
+    "evolution": {
+      "title": "Evolution Tracking",
+      "description": "Do not face your symptoms alone. DiagnoCare ensures regular follow-up to detect any worsening or complication."
+    },
+    "confidentiality": {
+      "title": "Total Confidentiality",
+      "description": "Your health data is encrypted end-to-end. It never leaves your device without your explicit consent."
+    }
+  },
+  "how_it_works": {
+    "category": "How it works",
+    "title": "A simple 4-step path to take care of you.",
+    "steps": {
+      "describe": {
+        "title": "1. Describe",
+        "description": "Enter your symptoms in natural language or via our guided list."
+      },
+      "analyze": {
+        "title": "2. Analyze",
+        "description": "Our AI compares your profile to thousands of similar cases instantly."
+      },
+      "understand": {
+        "title": "3. Understand",
+        "description": "Receive a detailed report with probable causes and advice."
+      },
+      "consult": {
+        "title": "4. Consult",
+        "description": "Get referred to the right specialist with a medical summary ready."
+      }
+    }
+  },
+  "faq": {
+    "category": "Frequently Asked Questions",
+    "title": "Everything you need to know before getting started.",
+    "items": [
+      {
+        "question": "Is this a medical diagnosis?",
+        "answer": "DiagnoCare provides decision support to guide your care, but does not replace the advice of a healthcare professional."
+      },
+      {
+        "question": "Is my data secure?",
+        "answer": "Yes. All information is encrypted and does not leave your device without your explicit consent."
+      },
+      {
+        "question": "How does the AI work?",
+        "answer": "Our AI compares your symptoms to thousands of validated cases to propose precise diagnostic hypotheses."
+      },
+      {
+        "question": "Can I share the results with my doctor?",
+        "answer": "You can export a summary of your evaluation and easily send it to your doctor."
+      },
+      {
+        "question": "How much does it cost?",
+        "answer": "The application offers a 100% free basic version, though the introduction of premium features is not ruled out."
+      }
+    ]
+  },
+  "cta": {
+    "category": "Ready to take charge of your health?",
+    "title": "Join the thousands of patients who use DiagnoCare.",
+    "description": "Improve your understanding of symptoms and get personalized recommendations today.",
+    "button": "Launch a free analysis",
+    "warning_title": "Important Warning:",
+    "warning_text": "DiagnoCare is a decision support tool and does not replace professional medical advice. This is not a medical diagnosis. In case of emergency, contact emergency services immediately."
+  },
+  "footer": {
+    "built_for": "© {{year}} DiagnoCare. Built for a clean care experience.",
+    "designed_for": "Designed for modern healthcare workflows."
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "how_it_works": "Comment ça marche ?",
+    "faq": "FAQ",
+    "login": "Se connecter",
+    "start": "Commencer"
+  },
+  "hero": {
+    "title": "Votre santé,",
+    "title_highlight": " éclairée par l'intelligence artificielle",
+    "description": "Une analyse de symptômes rapide, précise et confidentielle pour vous guider vers les bons soins. Technologie médicale avancée, interface simplifiée pour tous.",
+    "start_button": "Commencer une évaluation",
+    "learn_more": "En savoir plus"
+  },
+  "features": {
+    "category": "Pourquoi choisir DiagnoCare ?",
+    "title": "Une approche médicale rigoureuse alliée à la puissance de l’IA.",
+    "analysis": {
+      "title": "Analyse intelligente",
+      "description": "Nos algorithmes sont entraînés sur des millions de cas cliniques validés pour offrir une précision maximale dans l’identification des pathologies."
+    },
+    "evolution": {
+      "title": "Suivi d’évolution",
+      "description": "Ne restez pas seul face à vos symptômes. DiagnoCare assure un suivi régulier pour détecter toute aggravation ou complication."
+    },
+    "confidentiality": {
+      "title": "Confidentialité totale",
+      "description": "Vos données de santé sont chiffrées de bout en bout. Elles ne quittent jamais votre appareil sans votre consentement explicite."
+    }
+  },
+  "how_it_works": {
+    "category": "Comment ça marche ?",
+    "title": "Un parcours simple en 4 étapes pour prendre soin de vous.",
+    "steps": {
+      "describe": {
+        "title": "1. Décrivez",
+        "description": "Saisissez vos symptômes en langage naturel ou via notre liste guidée."
+      },
+      "analyze": {
+        "title": "2. Analysez",
+        "description": "Notre IA compare votre profil à des milliers de cas similaires instantanément."
+      },
+      "understand": {
+        "title": "3. Comprenez",
+        "description": "Recevez un rapport détaillé avec les causes probables et conseils."
+      },
+      "consult": {
+        "title": "4. Consultez",
+        "description": "Soyez orienté vers le bon spécialiste avec un résumé médical prêt."
+      }
+    }
+  },
+  "faq": {
+    "category": "Questions fréquentes",
+    "title": "Tout ce qu’il faut savoir avant de commencer.",
+    "items": [
+      {
+        "question": "Est-ce un diagnostic médical ?",
+        "answer": "DiagnoCare fournit une aide à la décision pour orienter vos soins, mais ne remplace pas l’avis d’un professionnel de santé."
+      },
+      {
+        "question": "Mes données sont-elles sécurisées ?",
+        "answer": "Oui. Toutes les informations sont chiffrées et ne quittent pas votre appareil sans votre consentement explicite."
+      },
+      {
+        "question": "Comment fonctionne l’IA ?",
+        "answer": "Notre IA compare vos symptômes à des milliers de cas validés pour proposer des hypothèses de diagnostic précises."
+      },
+      {
+        "question": "Puis-je partager les résultats avec mon médecin ?",
+        "answer": "Vous pouvez exporter un résumé de votre évaluation et le transmettre facilement à votre médecin."
+      },
+      {
+        "question": "Combien ça coûte ?",
+        "answer": "L’application propose une version de base 100% gratuite , il n'est pas a écarter l'avénement de fonctionnalités premium cependant ."
+      }
+    ]
+  },
+  "cta": {
+    "category": "Prêt à prendre votre santé en main ?",
+    "title": "Rejoignez les milliers de patients qui utilisent DiagnoCare.",
+    "description": "Améliorez votre compréhension des symptômes et obtenez des recommandations personnalisées dès aujourd’hui.",
+    "button": "Lancer une analyse gratuite",
+    "warning_title": "Avertissement important :",
+    "warning_text": "DiagnoCare est un outil d’aide à la décision et ne remplace pas un avis médical professionnel. Ceci n’est pas un diagnostic médical. En cas d’urgence, contactez immédiatement le 15 ou rendez-vous aux urgences."
+  },
+  "footer": {
+    "built_for": "© {{year}} DiagnoCare. Conçu pour une expérience de soins simplifiée.",
+    "designed_for": "Développé pour les parcours de soins modernes."
+  }
+}

@@ -1,14 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import heroImg from '../../assets/doctor.png'
-import fastImg from '../../assets/fast.png'
 import signalImg from '../../assets/signal.png'
-import fileImg from '../../assets/file.png'
 import confidentialImg from '../../assets/confidential.png'
-import doctorImg from '../../assets/doctor.png'
-import humanValidatedImg from '../../assets/human-validated.png'
 import { faqItems } from '../../utils/FaqItems'
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap, UserCheck, FileText, Stethoscope } from 'lucide-react';
 import Button from '../../components/basics/Button'
 
 
@@ -16,12 +13,12 @@ export function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <div className="space-y-24">
-      <section className="overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div>
+      <section className="overflow-hidden bg-slate-50 pt-12 pb-20 sm:pt-16 sm:pb-28 text-slate-900 dark:bg-slate-950 dark:text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:max-w-none">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div className="flex flex-col items-center space-y-6">
+            <div className="flex flex-col items-center text-center space-y-10">
+              <div className="flex flex-col items-center gap-10">
                 <div className='rounded-full m-2 bg-slate-200 p-2 w-24 h-24 mx-auto flex items-center justify-center dark:bg-slate-800'>
                   <img src={heroImg} alt="DiagnoCare illustration" className="h-14 w-14 object-contain" />
                 </div>
@@ -33,9 +30,9 @@ export function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
-                <a href="/login" className="flex items-center">
+                <Link to="/login" className="flex items-center">
                     <Button>Commencer une évaluation <ArrowRight className="ml-2"  /> </Button>  
-                </a>
+                </Link>
 
                 <a href="#how-it-works" >
                     <Button className="bg-background-200  border-primary text-black hover:bg-primary-100 ">
@@ -50,7 +47,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section id="features" className="bg-slate-100 py-20 dark:bg-slate-900">
+      <section id="features" className="bg-slate-100 dark:bg-slate-900 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Pourquoi choisir DiagnoCare ?</p>
@@ -60,8 +57,8 @@ export function HomePage() {
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-sky-50 dark:bg-slate-800">
-                <img src={fastImg} alt="Analyse intelligente" className="h-7 w-7" />
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-sky-100 dark:bg-slate-800">
+                <Zap className="h-7 w-7 text-sky-600 dark:text-sky-400" strokeWidth={1.5} />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Analyse intelligente</h3>
               <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
@@ -69,7 +66,7 @@ export function HomePage() {
               </p>
             </article>
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-emerald-50 dark:bg-slate-800">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-emerald-100 dark:bg-slate-800">
                 <img src={signalImg} alt="Suivi d'évolution" className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Suivi d’évolution</h3>
@@ -78,7 +75,7 @@ export function HomePage() {
               </p>
             </article>
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-violet-50 dark:bg-slate-800">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-violet-100 dark:bg-slate-800">
                 <img src={confidentialImg} alt="Confidentialité totale" className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Confidentialité totale</h3>
@@ -90,7 +87,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="bg-white py-20 dark:bg-slate-950">
+      <section id="how-it-works" className="bg-white py-20 sm:py-28 dark:bg-slate-950 relative">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Comment ça marche ?</p>
@@ -98,37 +95,40 @@ export function HomePage() {
               Un parcours simple en 4 étapes pour prendre soin de vous.
             </h2>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <article className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-white shadow-sm dark:bg-slate-800">
-                <img src={fileImg} alt="Décrivez" className="h-10 w-10" />
+          <div className="relative grid gap-6 md:grid-cols-2 lg:grid-cols-4 isolate">
+            {/* Horizontal connection line behind the circles */}
+            <div className="absolute top-16 left-[12.5%] right-[12.5%] hidden h-0.5 bg-slate-200 dark:bg-background-800 lg:block -z-10" />
+
+            <article className=" p-8 text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16  items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
+                <UserCheck className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">1. Décrivez</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Saisissez vos symptômes en langage naturel ou via notre liste guidée.
               </p>
             </article>
-            <article className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-white shadow-sm dark:bg-slate-800">
-                <img src={fastImg} alt="Analysez" className="h-10 w-10" />
+            <article className="  p-8 text-center ">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
+                <Zap className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">2. Analysez</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Notre IA compare votre profil à des milliers de cas similaires instantanément.
               </p>
             </article>
-            <article className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-white shadow-sm dark:bg-slate-800">
-                <img src={humanValidatedImg} alt="Comprenez" className="h-10 w-10" />
+            <article className="  p-8 text-center ">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
+                <FileText className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">3. Comprenez</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Recevez un rapport détaillé avec les causes probables et conseils.
               </p>
             </article>
-            <article className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-white shadow-sm dark:bg-slate-800">
-                <img src={doctorImg} alt="Consultez" className="h-10 w-10" />
+            <article className="  p-8 text-center ">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
+                <Stethoscope className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">4. Consultez</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
@@ -139,7 +139,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section id="faq" className="bg-slate-100 py-20 dark:bg-slate-900">
+      <section id="faq" className="bg-slate-100 py-20 sm:py-28 dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Questions fréquentes</p>
@@ -153,22 +153,32 @@ export function HomePage() {
                 key={item.question}
                 type="button"
                 onClick={() => setActiveIndex(activeIndex === index ? -1 : index)}
-                className="w-full rounded-[1.75rem] border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-950"
+                className="cursor-pointer w-full rounded-[1.75rem] border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-950"
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-base font-semibold text-slate-900 dark:text-white">{item.question}</span>
                   <span className="text-slate-500 dark:text-slate-400">{activeIndex === index ? '−' : '+'}</span>
                 </div>
-                {activeIndex === index ? (
-                  <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-400">{item.answer}</p>
-                ) : null}
+                <div
+                  className={`grid transition-all duration-200 ease-in-out ${
+                    activeIndex === index
+                      ? "grid-rows-[1fr] opacity-100 mt-4"
+                      : "grid-rows-[0fr] opacity-0 pointer-events-none"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="text-sm leading-7 text-slate-600 dark:text-slate-400">
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-primary py-20 text-white">
+      <section className="bg-primary py-20 sm:py-28 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
@@ -179,12 +189,12 @@ export function HomePage() {
               <p className="mt-5 max-w-2xl text-base leading-8 text-cyan-100/90">
                 Améliorez votre compréhension des symptômes et obtenez des recommandations personnalisées dès aujourd’hui.
               </p>
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="mt-8 inline-flex rounded-full bg-white px-8 py-3 text-sm font-semibold text-primary shadow-lg shadow-slate-950/20 transition hover:bg-slate-100"
               >
-                Lancer une analyse gratuite
-              </a>
+                Lancer une analysis gratuite
+              </Link>
             </div>
             <div className="rounded-[2rem] bg-slate-950/20 p-8 text-slate-100 shadow-xl shadow-slate-950/30">
               <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-100/80">Avertissement important :</p>
