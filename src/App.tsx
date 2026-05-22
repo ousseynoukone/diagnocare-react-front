@@ -1,10 +1,13 @@
 
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import AuthLayout from './layouts/AuthLayout'
 import PublicLayout from './layouts/PublicLayout'
 import MainLayout from './layouts/MainLayout'
+import AuthLayout from './layouts/AuthLayout'
 import { HomePage } from './pages/home/HomePage'
+import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 
 function App() {
   
@@ -12,15 +15,17 @@ function App() {
     <BrowserRouter>
 
     <Routes>
-    <Route element = {<AuthLayout />}>
 
-      <Route path = "/login" element = {<h1>Login page</h1>} />
-      <Route path = "/register" element = {<h1>Register page</h1>} />
-    </Route>
 
     <Route element = {<PublicLayout />}>
       <Route path = "/" element = {<HomePage />} />
       <Route path = "/home" element = {<HomePage />} />
+    </Route>
+
+    <Route element = {<AuthLayout />}>
+      <Route path = "/login" element = {<LoginPage />} />
+      <Route path = "/signup" element = {<RegisterPage />} />
+      <Route path = "/reset-password" element = {<ResetPasswordPage />} />
     </Route>
 
     <Route element = {<MainLayout />}>

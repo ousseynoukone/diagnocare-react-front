@@ -91,5 +91,42 @@
   "theme": {
     "dark": "Mode sombre",
     "light": "Mode clair"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion à votre espace",
+      "subtitle": "Accédez à vos suivis et résultats en toute sécurité.",
+      "email_label": "Adresse email",
+      "email_placeholder": "vous@exemple.com",
+      "password_label": "Mot de passe",
+      "password_placeholder": "••••••••",
+      "submit_button": "Se connecter",
+      "or_continue_with": "Ou continuer avec",
+      "forgot_password": "Mot de passe oublié ?",
+      "no_account": "Pas encore de compte ?",
+      "register_free": "S'inscrire gratuitement"
+    },
+    "register": {
+      "title": "Créer votre compte",
+      "subtitle": "Rejoignez DiagnoCare pour un suivi santé simplifié.",
+      "name_label": "Nom complet",
+      "name_placeholder": "Jean Dupont",
+      "email_label": "Adresse email",
+      "email_placeholder": "vous@exemple.com",
+      "password_label": "Mot de passe",
+      "password_placeholder": "••••••••",
+      "submit_button": "S'inscrire gratuitement",
+      "or_register_with": "Ou s'inscrire avec",
+      "have_account": "Vous avez déjà un compte ?",
+      "login_link": "Se connecter"
+    },
+    "reset_password": {
+      "title": "Mot de passe oublié ?",
+      "subtitle": "Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+      "email_label": "Adresse email",
+      "email_placeholder": "vous@exemple.com",
+      "submit_button": "Envoyer le lien de réinitialisation",
+      "back_to_login": "Retourner à la connexion"
+    }
   }
 }
