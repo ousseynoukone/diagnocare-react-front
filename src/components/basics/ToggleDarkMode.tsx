@@ -1,9 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ThemeStorageKey } from '../../types/storage-keys'
 
-
-
 export default function ToggleDarkMode() {
+  const { t } = useTranslation()
   // Read the initial theme class directly from the HTML element (set by index.html script)
   const [theme, setTheme] = useState<'dark' | 'light'>(() =>
     document.documentElement.classList.contains('dark') ? 'dark' : 'light'
@@ -32,7 +32,7 @@ export default function ToggleDarkMode() {
       ) : (
         <span aria-hidden="true">☀️</span>
       )}
-      <span >{theme === 'dark' ? 'Mode sombre' : 'Mode clair'}</span>
+      <span>{theme === 'dark' ? t('theme.dark') : t('theme.light')}</span>
     </button>
   )
 }

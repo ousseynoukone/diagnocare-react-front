@@ -87,5 +87,9 @@
   "footer": {
     "built_for": "© {{year}} DiagnoCare. Built for a clean care experience.",
     "designed_for": "Designed for modern healthcare workflows."
+  },
+  "theme": {
+    "dark": "Dark mode",
+    "light": "Light mode"
   }
 }

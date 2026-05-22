@@ -2,6 +2,26 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  background-color: #F8FAFC;
+}
+
+html.dark body {
+  background-color: #0F172A;
+}
+
+
 @theme {
   /* Base tokens */
   --color-primary: #1E40AF;

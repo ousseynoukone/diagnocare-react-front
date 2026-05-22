@@ -1,16 +1,22 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import heroImg from '../../assets/doctor.png'
 import signalImg from '../../assets/signal.png'
 import confidentialImg from '../../assets/confidential.png'
-import { faqItems } from '../../utils/FaqItems'
 
 import { ArrowRight, Zap, UserCheck, FileText, Stethoscope } from 'lucide-react';
 import Button from '../../components/basics/Button'
 
-
 export function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const { t } = useTranslation()
+
+  // Safely retrieve the localized FAQ items array
+  const faqRaw = t('faq.items', { returnObjects: true })
+  const faqItemsList = Array.isArray(faqRaw)
+    ? (faqRaw as Array<{ question: string; answer: string }>)
+    : []
 
   return (
     <div>
@@ -23,26 +29,24 @@ export function HomePage() {
                   <img src={heroImg} alt="DiagnoCare illustration" className="h-14 w-14 object-contain" />
                 </div>
                 <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl max-w-3xl">
-                  Votre santé, <span className='text-primary'> éclairée par l'intelligence artificielle</span> 
+                  {t('hero.title')}<span className='text-primary'>{t('hero.title_highlight')}</span> 
                 </h1>
                 <p className="max-w-2xl text-base leading-8 text-slate-700 dark:text-slate-300 sm:text-lg mx-auto">
-                  Une analyse de symptômes rapide, précise et confidentielle pour vous guider vers les bons soins. Technologie médicale avancée, interface simplifiée pour tous.
+                  {t('hero.description')}
                 </p>
               </div>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
                 <Link to="/login" className="flex items-center">
-                    <Button>Commencer une évaluation <ArrowRight className="ml-2"  /> </Button>  
+                  <Button>{t('hero.start_button')} <ArrowRight className="ml-2" /> </Button>  
                 </Link>
 
-                <a href="#how-it-works" >
-                    <Button className="bg-background-200  border-primary text-black hover:bg-primary-100 ">
-                      En savoir plus
-                    </Button>  
+                <a href="#how-it-works">
+                  <Button className="bg-background-200 border-primary text-black hover:bg-primary-100">
+                    {t('hero.learn_more')}
+                  </Button>  
                 </a>
-   
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -50,9 +54,9 @@ export function HomePage() {
       <section id="features" className="bg-slate-100 dark:bg-slate-900 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Pourquoi choisir DiagnoCare ?</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">{t('features.category')}</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-              Une approche médicale rigoureuse alliée à la puissance de l’IA.
+              {t('features.title')}
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -60,27 +64,27 @@ export function HomePage() {
               <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-sky-100 dark:bg-slate-800">
                 <Zap className="h-7 w-7 text-sky-600 dark:text-sky-400" strokeWidth={1.5} />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Analyse intelligente</h3>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t('features.analysis.title')}</h3>
               <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Nos algorithmes sont entraînés sur des millions de cas cliniques validés pour offrir une précision maximale dans l’identification des pathologies.
+                {t('features.analysis.description')}
               </p>
             </article>
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
               <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-emerald-100 dark:bg-slate-800">
                 <img src={signalImg} alt="Suivi d'évolution" className="h-7 w-7" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Suivi d’évolution</h3>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t('features.evolution.title')}</h3>
               <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Ne restez pas seul face à vos symptômes. DiagnoCare assure un suivi régulier pour détecter toute aggravation ou complication.
+                {t('features.evolution.description')}
               </p>
             </article>
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
               <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-violet-100 dark:bg-slate-800">
                 <img src={confidentialImg} alt="Confidentialité totale" className="h-7 w-7" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Confidentialité totale</h3>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t('features.confidentiality.title')}</h3>
               <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Vos données de santé sont chiffrées de bout en bout. Elles ne quittent jamais votre appareil sans votre consentement explicite.
+                {t('features.confidentiality.description')}
               </p>
             </article>
           </div>
@@ -90,49 +94,49 @@ export function HomePage() {
       <section id="how-it-works" className="bg-white py-20 sm:py-28 dark:bg-slate-950 relative">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Comment ça marche ?</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">{t('how_it_works.category')}</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-              Un parcours simple en 4 étapes pour prendre soin de vous.
+              {t('how_it_works.title')}
             </h2>
           </div>
           <div className="relative grid gap-6 md:grid-cols-2 lg:grid-cols-4 isolate">
             {/* Horizontal connection line behind the circles */}
             <div className="absolute top-16 left-[12.5%] right-[12.5%] hidden h-0.5 bg-slate-200 dark:bg-background-800 lg:block -z-10" />
 
-            <article className=" p-8 text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16  items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
+            <article className="p-8 text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
                 <UserCheck className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">1. Décrivez</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('how_it_works.steps.describe.title')}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Saisissez vos symptômes en langage naturel ou via notre liste guidée.
+                {t('how_it_works.steps.describe.description')}
               </p>
             </article>
-            <article className="  p-8 text-center ">
+            <article className="p-8 text-center">
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
                 <Zap className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">2. Analysez</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('how_it_works.steps.analyze.title')}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Notre IA compare votre profil à des milliers de cas similaires instantanément.
+                {t('how_it_works.steps.analyze.description')}
               </p>
             </article>
-            <article className="  p-8 text-center ">
+            <article className="p-8 text-center">
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
                 <FileText className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">3. Comprenez</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('how_it_works.steps.understand.title')}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Recevez un rapport détaillé avec les causes probables et conseils.
+                {t('how_it_works.steps.understand.description')}
               </p>
             </article>
-            <article className="  p-8 text-center ">
+            <article className="p-8 text-center">
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white border-4 border-slate-100 dark:border-background-300 dark:bg-background-100">
                 <Stethoscope className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">4. Consultez</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('how_it_works.steps.consult.title')}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                Soyez orienté vers le bon spécialiste avec un résumé médical prêt.
+                {t('how_it_works.steps.consult.description')}
               </p>
             </article>
           </div>
@@ -142,13 +146,13 @@ export function HomePage() {
       <section id="faq" className="bg-slate-100 py-20 sm:py-28 dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Questions fréquentes</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">{t('faq.category')}</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-              Tout ce qu’il faut savoir avant de commencer.
+              {t('faq.title')}
             </h2>
           </div>
           <div className="space-y-4">
-            {faqItems.map((item, index) => (
+            {faqItemsList.map((item, index) => (
               <button
                 key={item.question}
                 type="button"
@@ -182,24 +186,24 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-100/80">Prêt à prendre votre santé en main ?</p>
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-100/80">{t('cta.category')}</p>
               <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Rejoignez les milliers de patients qui utilisent DiagnoCare.
+                {t('cta.title')}
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-8 text-cyan-100/90">
-                Améliorez votre compréhension des symptômes et obtenez des recommandations personnalisées dès aujourd’hui.
+                {t('cta.description')}
               </p>
               <Link
                 to="/login"
                 className="mt-8 inline-flex rounded-full bg-white px-8 py-3 text-sm font-semibold text-primary shadow-lg shadow-slate-950/20 transition hover:bg-slate-100"
               >
-                Lancer une analysis gratuite
+                {t('cta.button')}
               </Link>
             </div>
             <div className="rounded-[2rem] bg-slate-950/20 p-8 text-slate-100 shadow-xl shadow-slate-950/30">
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-100/80">Avertissement important :</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-100/80">{t('cta.warning_title')}</p>
               <p className="mt-4 text-sm leading-7 text-cyan-100/90">
-                DiagnoCare est un outil d’aide à la décision et ne remplace pas un avis médical professionnel. Ceci n’est pas un diagnostic médical. En cas d’urgence, contactez immédiatement le 15 ou rendez-vous aux urgences.
+                {t('cta.warning_text')}
               </p>
             </div>
           </div>
