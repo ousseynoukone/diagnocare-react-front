@@ -8,6 +8,8 @@ import doctorImg from '../../assets/doctor.png'
 import humanValidatedImg from '../../assets/human-validated.png'
 import { faqItems } from '../../utils/FaqItems'
 
+import { ArrowRight } from 'lucide-react';
+import Button from '../../components/basics/Button'
 
 
 export function HomePage() {
@@ -31,18 +33,16 @@ export function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
-                <a
-                  href="/login"
-                  className="inline-flex justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-sky-500"
-                >
-                  Commencer une évaluation
+                <a href="/login" className="flex items-center">
+                    <Button>Commencer une évaluation <ArrowRight className="ml-2"  /> </Button>  
                 </a>
-                <a
-                  href="#how-it-works"
-                  className="inline-flex justify-center rounded-full border border-slate-300 bg-white px-8 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
-                >
-                  En savoir plus
+
+                <a href="#how-it-works" >
+                    <Button className="bg-background-200  border-primary text-black hover:bg-primary-100 ">
+                      En savoir plus
+                    </Button>  
                 </a>
+   
               </div>
             </div>
 
