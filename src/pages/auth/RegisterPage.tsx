@@ -100,8 +100,8 @@ export default function RegisterPage() {
 
                     {/* Links */}
                     <div className="flex flex-col items-center gap-2 pt-2 text-center">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">{t('auth.register.have_account')}{" "}
-                            <Link to="/login" className="text-primary hover:underline ps-1 cursor-pointer font-medium">{t('auth.register.login_link')}</Link>
+                        <span className="text-sm text-slate-500 dark:text-primary-400">{t('auth.register.have_account')}{" "}
+                            <Link to="/login" className="text-primary dark:text-primary-400 hover:underline ps-1 cursor-pointer font-medium">{t('auth.register.login_link')}</Link>
                         </span>
                     </div>
                 </form>

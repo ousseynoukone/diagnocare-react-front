@@ -87,9 +87,9 @@ export default function LoginPage() {
 
                     {/* Links */}
                     <div className="flex flex-col items-center gap-2 pt-2 text-center">
-                        <Link to="/reset-password" className="text-sm text-primary hover:underline cursor-pointer font-medium">{t('auth.login.forgot_password')}</Link>
+                        <Link to="/reset-password" className="text-sm text-primary dark:text-primary-400 hover:underline cursor-pointer font-medium">{t('auth.login.forgot_password')}</Link>
                         <span className="text-sm text-slate-500 dark:text-slate-400">{t('auth.login.no_account')}{" "}
-                            <Link to="/signup" className="text-primary hover:underline ps-1 cursor-pointer font-medium">{t('auth.login.register_free')}</Link>
+                            <Link to="/signup" className="text-primary dark:text-primary-400 hover:underline ps-1 cursor-pointer font-medium">{t('auth.login.register_free')}</Link>
                         </span>
                     </div>
                 </form>
