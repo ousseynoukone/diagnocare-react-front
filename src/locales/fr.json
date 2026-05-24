@@ -122,11 +122,24 @@
     },
     "reset_password": {
       "title": "Mot de passe oublié ?",
-      "subtitle": "Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+      "subtitle": "Saisissez votre adresse e-mail pour recevoir un code de réinitialisation.",
       "email_label": "Adresse email",
       "email_placeholder": "vous@exemple.com",
-      "submit_button": "Envoyer le lien de réinitialisation",
-      "back_to_login": "Retourner à la connexion"
+      "submit_button": "Envoyer le code de réinitialisation",
+      "back_to_login": "Retourner à la connexion",
+      "subtitle_step2": "Saisissez le code de réinitialisation et votre nouveau mot de passe.",
+      "code_label": "Code de vérification",
+      "code_placeholder": "123456",
+      "new_password_label": "Nouveau mot de passe",
+      "new_password_placeholder": "••••••••",
+      "confirm_password_label": "Confirmer le nouveau mot de passe",
+      "confirm_password_placeholder": "••••••••",
+      "submit_confirm_button": "Réinitialiser le mot de passe",
+      "resend_code": "Renvoyer le code",
+      "resend_cooldown": "Renvoyer ({{seconds}}s)",
+      "error_mismatch": "Les mots de passe ne correspondent pas.",
+      "success_email_sent": "Un code de réinitialisation a été envoyé à votre adresse e-mail.",
+      "success_password_reset": "Votre mot de passe a été réinitialisé avec succès !"
     }
   }
 }

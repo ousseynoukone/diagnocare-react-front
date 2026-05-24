@@ -1,15 +1,60 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import logo from '../../assets/logo-blue.png';
 import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { useLogin } from '../../hooks/useAuth';
+import type { LoginDTO } from '../../types/models/Auth';
+import { useForm } from 'react-hook-form';
+import { handleApiError } from '../../utils/errorHelper';
 
 export default function LoginPage() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const { mutate, isPending } = useLogin();
+    const { register, handleSubmit, setError, watch, formState: { errors } } = useForm();
+    const [generalError, setGeneralError] = useState<React.ReactNode | null>(null);
+
+    const onSubmit = (data: any) => {
+        setGeneralError(null);
+        const email = data.email as string;
+        const password = data.password as string;
+
+        const loginDto: LoginDTO = {
+            email: email,
+            password: password
+        };
+        
+        mutate(loginDto, {
+            onSuccess: () => {
+                navigate('/dashboard');
+            },
+            onError: (err: any) => {
+                const apiError = err?.response?.data;
+                if (apiError && apiError.message === "Email not verified") {
+                    setGeneralError(
+                        <span>
+                            Votre adresse e-mail n'est pas validée.{" "}
+                            <Link 
+                                to={`/verify-email?email=${encodeURIComponent(email)}`} 
+                                className="underline font-semibold hover:text-red-300 dark:hover:text-red-200"
+                            >
+                                Cliquez ici pour activer votre compte.
+                            </Link>
+                        </span>
+                    );
+                } else {
+                    handleApiError(err, setError, setGeneralError, "Identifiants incorrects ou service indisponible.");
+                }
+            }
+        });
+    };
+
 
     return ( 
+
         <div className="flex flex-col gap-6 max-w-md mx-auto w-full items-center justify-center min-h-[85vh] px-4 py-8">
             {/* Header / Logo */}
             <div className="gap-3 mb-2 items-center flex flex-col text-center"> 
@@ -20,19 +65,37 @@ export default function LoginPage() {
 
             {/* Login Card */}
             <div className="shadow-xl rounded-xl w-full bg-white p-8 border border-slate-100 dark:border-slate-800/40 dark:bg-slate-900 dark:shadow-slate-950/40">
-                <form className="space-y-5" action="#" method="POST">
+                <form className="space-y-5" action="#" method="POST" onSubmit={handleSubmit(onSubmit)}>
+                    {generalError && (
+                        <div className="flex gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/10 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm">
+                            <AlertTriangle className="h-5 w-5 shrink-0" />
+                            <span>{generalError}</span>
+                        </div>
+                    )}
+
                     {/* Email Input */}
                     <div className="space-y-1.5">
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.login.email_label')}</label>
                         <input 
                             id="email" 
-                            name="email" 
                             type="email" 
                             placeholder={t('auth.login.email_placeholder')} 
                             autoComplete="email" 
-                            required 
-                            className="w-full rounded-lg border border-slate-200 px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150" 
+                            disabled={isPending}
+                            className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                            {...register("email", { 
+                                required: "L'adresse email est requise.", 
+                                pattern: {
+                                    value: /^\S+@\S+$/i,
+                                    message: "Veuillez entrer une adresse e-mail valide."
+                                }
+                            })}
                         />
+                        {errors.email && (
+                            <span className="text-red-500 text-xs mt-1 block">
+                                {errors.email.message as string}
+                            </span>
+                        )}
                     </div>
 
                     {/* Password Input */}
@@ -41,27 +104,39 @@ export default function LoginPage() {
                         <div className="relative mt-1">
                             <input 
                                 id="password" 
-                                name="password" 
                                 type={showPassword ? "text" : "password"} 
                                 placeholder={t('auth.login.password_placeholder')} 
                                 autoComplete="current-password" 
-                                required 
-                                className="w-full rounded-lg border border-slate-200 pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150" 
+                                disabled={isPending}
+                                className={`w-full rounded-lg border pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                {...register("password", { 
+                                    required: "Le mot de passe est requis." 
+                                })}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 cursor-pointer"
+                                disabled={isPending}
+                                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 cursor-pointer disabled:opacity-50"
                             >
                                 {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                             </button>
                         </div>
+                        {errors.password && (
+                            <span className="text-red-500 text-xs mt-1 block">
+                                {errors.password.message as string}
+                            </span>
+                        )}
                     </div>
 
                     {/* Submit Button */}
-                    <Button className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2" >
-                        <span>{t('auth.login.submit_button')}</span>
-                        <ArrowRight className="h-4 w-4" />
+                    <Button 
+                        type="submit" 
+                        disabled={isPending}
+                        className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2 disabled:opacity-60 disabled:cursor-not-allowed w-full flex items-center gap-2"
+                    >
+                        <span>{isPending ? "Connexion..." : t('auth.login.submit_button')}</span>
+                        {!isPending && <ArrowRight className="h-4 w-4" />}
                     </Button>
 
                     {/* Divider */}
@@ -91,6 +166,12 @@ export default function LoginPage() {
                         <span className="text-sm text-slate-500 dark:text-slate-400">{t('auth.login.no_account')}{" "}
                             <Link to="/signup" className="text-primary dark:text-primary-400 hover:underline ps-1 cursor-pointer font-medium">{t('auth.login.register_free')}</Link>
                         </span>
+                        <Link 
+                            to={`/verify-email?email=${encodeURIComponent(watch("email") || '')}`} 
+                            className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary hover:underline cursor-pointer font-medium mt-1"
+                        >
+                            Activer mon compte (Code OTP)
+                        </Link>
                     </div>
                 </form>
             </div>

@@ -1,13 +1,50 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import logo from '../../assets/logo-blue.png';
 import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { useRegister } from '../../hooks/useAuth';
+import { type RegisterDTO, Role } from '../../types/models/Auth';
+import { handleApiError } from '../../utils/errorHelper';
+import { getBrowserLang } from '../../utils/browserSettings';
+import { toast } from 'sonner';
+
 
 export default function RegisterPage() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const { mutate, isPending } = useRegister();
+    const { register, handleSubmit, setError, formState: { errors } } = useForm();
+    const [generalError, setGeneralError] = useState<string | null>(null);
+
+    const onSubmit = (data: any) => {
+        const registerDto: RegisterDTO = {
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            password: data.password,
+            roleId: Role.PATIENT, 
+            lang: getBrowserLang(),
+        };
+
+        mutate(registerDto, {
+            onSuccess: () => {
+                toast.success("Compte créé avec succès ! Un e-mail de validation vous a été envoyé.");
+                navigate(`/verify-email?email=${encodeURIComponent(registerDto.email)}`);
+            },
+            onError: (err: any) => {
+                handleApiError(
+                    err, 
+                    setError, 
+                    setGeneralError, 
+                    "Une erreur est survenue lors de l'inscription."
+                );
+            }
+        });
+    };
 
     return ( 
         <div className="flex flex-col gap-6 max-w-md mx-auto w-full items-center justify-center min-h-[85vh] px-4 py-8">
@@ -20,18 +57,59 @@ export default function RegisterPage() {
 
             {/* Register Card */}
             <div className="shadow-xl rounded-xl w-full bg-white p-8 border border-slate-100 dark:border-slate-800/40 dark:bg-slate-900 dark:shadow-slate-950/40">
-                <form className="space-y-5" action="#" method="POST">
-                    {/* Name Input */}
-                    <div className="space-y-1.5">
-                        <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.register.name_label')}</label>
-                        <input 
-                            id="name" 
-                            name="name" 
-                            type="text" 
-                            placeholder={t('auth.register.name_placeholder')} 
-                            required 
-                            className="w-full rounded-lg border border-slate-200 px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150" 
-                        />
+                <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                    {generalError && (
+                        <div className="flex gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/10 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm">
+                            <AlertTriangle className="h-5 w-5 shrink-0" />
+                            <span>{generalError}</span>
+                        </div>
+                    )}
+
+
+
+                    {/* Name Inputs (FirstName & LastName) */}
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* FirstName Input */}
+                        <div className="space-y-1.5">
+                            <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Prénom</label>
+                            <input 
+                                id="firstName" 
+                                type="text" 
+                                placeholder="Jean" 
+                                disabled={isPending}
+                                className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.firstName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                {...register("firstName", { 
+                                    required: "Le prénom est requis.",
+                                    minLength: { value: 2, message: "Le prénom doit faire au moins 2 caractères." }
+                                })}
+                            />
+                            {errors.firstName && (
+                                <span className="text-red-500 text-xs mt-1 block">
+                                    {errors.firstName.message as string}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* LastName Input */}
+                        <div className="space-y-1.5">
+                            <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Nom</label>
+                            <input 
+                                id="lastName" 
+                                type="text" 
+                                placeholder="Dupont" 
+                                disabled={isPending}
+                                className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.lastName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                {...register("lastName", { 
+                                    required: "Le nom est requis.",
+                                    minLength: { value: 2, message: "Le nom doit faire au moins 2 caractères." }
+                                })}
+                            />
+                            {errors.lastName && (
+                                <span className="text-red-500 text-xs mt-1 block">
+                                    {errors.lastName.message as string}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Email Input */}
@@ -39,13 +117,24 @@ export default function RegisterPage() {
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.register.email_label')}</label>
                         <input 
                             id="email" 
-                            name="email" 
                             type="email" 
                             placeholder={t('auth.register.email_placeholder')} 
                             autoComplete="email" 
-                            required 
-                            className="w-full rounded-lg border border-slate-200 px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150" 
+                            disabled={isPending}
+                            className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                            {...register("email", { 
+                                required: "L'adresse email est requise.", 
+                                pattern: {
+                                    value: /^\S+@\S+$/i,
+                                    message: "Veuillez entrer une adresse e-mail valide."
+                                }
+                            })}
                         />
+                        {errors.email && (
+                            <span className="text-red-500 text-xs mt-1 block">
+                                {errors.email.message as string}
+                            </span>
+                        )}
                     </div>
 
                     {/* Password Input */}
@@ -54,27 +143,40 @@ export default function RegisterPage() {
                         <div className="relative mt-1">
                             <input 
                                 id="password" 
-                                name="password" 
                                 type={showPassword ? "text" : "password"} 
-                                placeholder={t('auth.register.password_placeholder')} 
+                                placeholder={t('auth.login.password_placeholder')} 
                                 autoComplete="new-password" 
-                                required 
-                                className="w-full rounded-lg border border-slate-200 pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150" 
+                                disabled={isPending}
+                                className={`w-full rounded-lg border pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                {...register("password", { 
+                                    required: "Le mot de passe est requis.",
+                                    minLength: { value: 8, message: "Le mot de passe doit comporter au moins 8 caractères." }
+                                })}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 cursor-pointer"
+                                disabled={isPending}
+                                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 cursor-pointer disabled:opacity-50"
                             >
                                 {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
                             </button>
                         </div>
+                        {errors.password && (
+                            <span className="text-red-500 text-xs mt-1 block">
+                                {errors.password.message as string}
+                            </span>
+                        )}
                     </div>
 
                     {/* Submit Button */}
-                    <Button className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2" >
-                        <span>{t('auth.register.submit_button')}</span>
-                        <ArrowRight className="h-4 w-4" />
+                    <Button 
+                        type="submit" 
+                        disabled={isPending}
+                        className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2 disabled:opacity-60 disabled:cursor-not-allowed w-full flex items-center gap-2"
+                    >
+                        <span>{isPending ? "Création..." : t('auth.register.submit_button')}</span>
+                        {!isPending && <ArrowRight className="h-4 w-4" />}
                     </Button>
 
                     {/* Divider */}
