@@ -7,10 +7,13 @@ import confidentialImg from '../../assets/confidential.png'
 
 import { ArrowRight, Zap, UserCheck, FileText, Stethoscope } from 'lucide-react';
 import Button from '../../components/basics/Button'
+import { useUserStore } from '../../store/UserStore'
 
 export function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0)
   const { t } = useTranslation()
+  const user = useUserStore((state) => state.user)
+  const actionLink = user ? '/dashboard' : '/login'
 
   // Safely retrieve the localized FAQ items array
   const faqRaw = t('faq.items', { returnObjects: true })
@@ -36,7 +39,7 @@ export function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
-                <Link to="/login" className="flex items-center">
+                <Link to={actionLink} className="flex items-center">
                   <Button>{t('hero.start_button')} <ArrowRight className="ml-2" /> </Button>  
                 </Link>
 
@@ -194,7 +197,7 @@ export function HomePage() {
                 {t('cta.description')}
               </p>
               <Link
-                to="/login"
+                to={actionLink}
                 className="mt-8 inline-flex rounded-full bg-white px-8 py-3 text-sm font-semibold text-primary shadow-lg shadow-slate-950/20 transition hover:bg-slate-100"
               >
                 {t('cta.button')}

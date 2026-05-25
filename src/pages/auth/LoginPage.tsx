@@ -8,7 +8,9 @@ import { useLogin } from '../../hooks/useAuth';
 import type { LoginDTO } from '../../types/models/Auth';
 import { useForm } from 'react-hook-form';
 import { handleApiError } from '../../utils/errorHelper';
-
+import { useUserStore } from '../../store/UserStore';
+import { toUserProfileDTO } from '../../types/models/User';
+    
 export default function LoginPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -16,6 +18,8 @@ export default function LoginPage() {
     const { mutate, isPending } = useLogin();
     const { register, handleSubmit, setError, watch, formState: { errors } } = useForm();
     const [generalError, setGeneralError] = useState<React.ReactNode | null>(null);
+
+    const setUser = useUserStore((state) => state.setUser);
 
     const onSubmit = (data: any) => {
         setGeneralError(null);
@@ -28,7 +32,9 @@ export default function LoginPage() {
         };
         
         mutate(loginDto, {
-            onSuccess: () => {
+            onSuccess: (data: any) => {
+                const user = toUserProfileDTO(data.user);
+                setUser(user);
                 navigate('/dashboard');
             },
             onError: (err: any) => {
