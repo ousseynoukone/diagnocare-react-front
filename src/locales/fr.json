@@ -140,6 +140,26 @@
       "error_mismatch": "Les mots de passe ne correspondent pas.",
       "success_email_sent": "Un code de réinitialisation a été envoyé à votre adresse e-mail.",
       "success_password_reset": "Votre mot de passe a été réinitialisé avec succès !"
+    },
+    "verify_email": {
+      "title": "Vérifiez votre compte",
+      "subtitle": "Saisissez le code OTP à 6 chiffres envoyé à votre adresse e-mail (valide pendant 10 minutes).",
+      "success_verified": "Votre compte a été vérifié avec succès ! Vous pouvez maintenant vous connecter.",
+      "error_invalid_otp": "Le code de vérification est invalide ou a expiré.",
+      "error_enter_email": "Veuillez saisir une adresse email pour renvoyer le code.",
+      "success_code_sent": "Un nouveau code de vérification a été envoyé par email.",
+      "error_resend_failed": "Impossible de renvoyer le code de vérification.",
+      "email_label": "Adresse email",
+      "email_required": "L'adresse email est requise.",
+      "email_invalid": "Veuillez entrer une adresse e-mail valide.",
+      "code_label": "Code de vérification",
+      "resend_code": "Renvoyer le code",
+      "resend_cooldown": "Renvoyer ({{seconds}}s)",
+      "code_required": "Le code est requis.",
+      "code_pattern": "Le code doit être composé de 6 chiffres.",
+      "submit_button": "Valider le code",
+      "submitting_button": "Validation...",
+      "back_to_login": "Retour à la page de connexion"
     }
   }
 }
