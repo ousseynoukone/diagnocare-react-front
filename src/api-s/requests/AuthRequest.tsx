@@ -5,11 +5,16 @@ import { apiClient } from '../AxiosApiClient';
 export function AuthRequest(login: LoginDTO) {
     return apiClient.post('/auth/login', login)
         .then(response => {
-            const token = response.data.token;
+            const payload = response.data.data ?? response.data;
+            const token = payload.token;
+            const refreshToken = payload.refreshToken;
             if (token) {
                 localStorage.setItem('token', token);
             }
-            return response.data;
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
+            return payload;
         })
         .catch(error => {
             console.error('Login failed:', error);
@@ -57,11 +62,16 @@ export function ValidateOtpRequest(otpData: OtpValidateDTO) {
 export function RefreshTokenRequest(refreshTokenData: RefreshTokenDTO) {
     return apiClient.post('/auth/refresh-token', refreshTokenData)
         .then(response => {
-            const token = response.data.token;
+            const payload = response.data.data ?? response.data;
+            const token = payload.token;
+            const refreshToken = payload.refreshToken;
             if (token) {
                 localStorage.setItem('token', token);
             }
-            return response.data;
+            if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+            }
+            return payload;
         })
         .catch(error => {
             console.error('Token refresh failed:', error);

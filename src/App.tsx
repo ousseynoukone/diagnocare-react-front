@@ -8,6 +8,8 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import VerifyEmailPage from './pages/auth/VerifyEmailPage'
+import TermsOfServicePage from './pages/legal/TermsOfServicePage'
+import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
 import { Toaster } from 'sonner'
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
         </Route>
 
         <Route element={<AuthLayout />}>

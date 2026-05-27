@@ -21,6 +21,8 @@ export interface RegisterDTO{
     password: string;
     roleId: Role;
     lang: string;
+    termsAccepted: boolean;
+    privacyPolicyAccepted: boolean;
 }
 
 export interface OtpSendDTO {

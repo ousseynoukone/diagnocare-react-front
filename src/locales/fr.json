@@ -14,13 +14,13 @@
   },
   "features": {
     "category": "Pourquoi choisir DiagnoCare ?",
-    "title": "Une approche médicale rigoureuse alliée à la puissance de l’IA.",
+    "title": "Une approche médicale rigoureuse alliée à la puissance de l'IA.",
     "analysis": {
       "title": "Analyse intelligente",
-      "description": "Nos algorithmes sont entraînés sur des millions de cas cliniques validés pour offrir une précision maximale dans l’identification des pathologies."
+      "description": "Nos algorithmes sont entraînés sur des millions de cas cliniques validés pour offrir une précision maximale dans l'identification des pathologies."
     },
     "evolution": {
-      "title": "Suivi d’évolution",
+      "title": "Suivi d'évolution",
       "description": "Ne restez pas seul face à vos symptômes. DiagnoCare assure un suivi régulier pour détecter toute aggravation ou complication."
     },
     "confidentiality": {
@@ -52,18 +52,18 @@
   },
   "faq": {
     "category": "Questions fréquentes",
-    "title": "Tout ce qu’il faut savoir avant de commencer.",
+    "title": "Tout ce qu'il faut savoir avant de commencer.",
     "items": [
       {
         "question": "Est-ce un diagnostic médical ?",
-        "answer": "DiagnoCare fournit une aide à la décision pour orienter vos soins, mais ne remplace pas l’avis d’un professionnel de santé."
+        "answer": "DiagnoCare fournit une aide à la décision pour orienter vos soins, mais ne remplace pas l'avis d'un professionnel de santé."
       },
       {
         "question": "Mes données sont-elles sécurisées ?",
         "answer": "Oui. Toutes les informations sont chiffrées et ne quittent pas votre appareil sans votre consentement explicite."
       },
       {
-        "question": "Comment fonctionne l’IA ?",
+        "question": "Comment fonctionne l'IA ?",
         "answer": "Notre IA compare vos symptômes à des milliers de cas validés pour proposer des hypothèses de diagnostic précises."
       },
       {
@@ -72,21 +72,23 @@
       },
       {
         "question": "Combien ça coûte ?",
-        "answer": "L’application propose une version de base 100% gratuite , il n'est pas a écarter l'avénement de fonctionnalités premium cependant ."
+        "answer": "L'application propose une version de base 100% gratuite , il n'est pas a écarter l'avénement de fonctionnalités premium cependant ."
       }
     ]
   },
   "cta": {
     "category": "Prêt à prendre votre santé en main ?",
     "title": "Rejoignez les milliers de patients qui utilisent DiagnoCare.",
-    "description": "Améliorez votre compréhension des symptômes et obtenez des recommandations personnalisées dès aujourd’hui.",
+    "description": "Améliorez votre compréhension des symptômes et obtenez des recommandations personnalisées dès aujourd'hui.",
     "button": "Lancer une analyse gratuite",
     "warning_title": "Avertissement important :",
-    "warning_text": "DiagnoCare est un outil d’aide à la décision et ne remplace pas un avis médical professionnel. Ceci n’est pas un diagnostic médical. En cas d’urgence, contactez immédiatement le 15 ou rendez-vous aux urgences."
+    "warning_text": "DiagnoCare est un outil d'aide à la décision et ne remplace pas un avis médical professionnel. Ceci n'est pas un diagnostic médical. En cas d'urgence, contactez immédiatement le 15 ou rendez-vous aux urgences."
   },
   "footer": {
     "built_for": "© {{year}} DiagnoCare. Conçu pour une expérience de soins simplifiée.",
-    "designed_for": "Développé pour les parcours de soins modernes."
+    "designed_for": "Développé pour les parcours de soins modernes.",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité"
   },
   "theme": {
     "dark": "Mode sombre",
@@ -118,7 +120,13 @@
       "submit_button": "S'inscrire gratuitement",
       "or_register_with": "Ou s'inscrire avec",
       "have_account": "Vous avez déjà un compte ?",
-      "login_link": "Se connecter"
+      "login_link": "Se connecter",
+      "terms_label": "J'accepte les",
+      "terms_link": "Conditions d'utilisation",
+      "terms_required": "Vous devez accepter les conditions d'utilisation.",
+      "privacy_label": "J'accepte la",
+      "privacy_link": "Politique de confidentialité",
+      "privacy_required": "Vous devez accepter la politique de confidentialité."
     },
     "reset_password": {
       "title": "Mot de passe oublié ?",
@@ -160,6 +168,77 @@
       "submit_button": "Valider le code",
       "submitting_button": "Validation...",
       "back_to_login": "Retour à la page de connexion"
+    }
+  },
+  "legal": {
+    "back_to_home": "Retour à l'accueil",
+    "terms": {
+      "badge": "Document légal",
+      "title": "Conditions d'utilisation",
+      "last_updated": "Dernière mise à jour : {{date}}",
+      "introduction": "Bienvenue sur DiagnoCare. En utilisant notre plateforme, vous acceptez les présentes conditions d'utilisation. Veuillez les lire attentivement avant d'utiliser nos services. DiagnoCare est un outil d'aide à la décision médicale basé sur l'intelligence artificielle, conçu pour orienter les patients dans leur parcours de soins.",
+      "sections": {
+        "usage": {
+          "title": "Conditions d'utilisation du service",
+          "content": "DiagnoCare est destiné aux personnes majeures souhaitant obtenir une évaluation préliminaire de leurs symptômes. Vous vous engagez à fournir des informations exactes et à jour lors de votre inscription et de l'utilisation du service. L'utilisation abusive, frauduleuse ou à des fins commerciales non autorisées est strictement interdite. Nous nous réservons le droit de suspendre ou de résilier tout compte en cas de violation des présentes conditions."
+        },
+        "responsibilities": {
+          "title": "Responsabilités de l'utilisateur",
+          "content": "En tant qu'utilisateur, vous êtes responsable de la confidentialité de vos identifiants de connexion. Vous vous engagez à ne pas partager votre compte avec des tiers. Vous reconnaissez que les résultats fournis par DiagnoCare sont à titre informatif et ne se substituent en aucun cas à un avis médical professionnel. Toute décision médicale doit être prise en consultation avec un professionnel de santé qualifié."
+        },
+        "medical_disclaimer": {
+          "title": "Avertissement médical",
+          "content": "DiagnoCare est un outil d'aide à la décision et ne constitue pas un diagnostic médical. Les résultats et recommandations fournis sont basés sur des algorithmes d'intelligence artificielle et ne remplacent en aucun cas l'avis d'un médecin, pharmacien ou tout autre professionnel de santé. En cas d'urgence médicale, veuillez contacter immédiatement les services d'urgence (15 ou 112) ou vous rendre aux urgences les plus proches."
+        },
+        "liability": {
+          "title": "Limitation de responsabilité",
+          "content": "DiagnoCare et ses développeurs ne sauraient être tenus responsables des conséquences directes ou indirectes résultant de l'utilisation de la plateforme. Cela inclut, sans s'y limiter, les décisions médicales prises sur la base des résultats fournis par l'application, les interruptions de service, les pertes de données ou tout autre dommage lié à l'utilisation du service."
+        },
+        "modifications": {
+          "title": "Modifications des conditions",
+          "content": "Nous nous réservons le droit de modifier ces conditions d'utilisation à tout moment. Les modifications entreront en vigueur dès leur publication sur la plateforme. Il est de votre responsabilité de consulter régulièrement les conditions d'utilisation. La poursuite de l'utilisation du service après modification vaut acceptation des nouvelles conditions."
+        }
+      },
+      "contact": {
+        "title": "Nous contacter",
+        "content": "Pour toute question relative aux présentes conditions d'utilisation, vous pouvez nous contacter par e-mail à l'adresse support@diagnocare.com ou via le formulaire de contact disponible sur notre plateforme."
+      }
+    },
+    "privacy": {
+      "badge": "Confidentialité",
+      "title": "Politique de confidentialité",
+      "last_updated": "Dernière mise à jour : {{date}}",
+      "introduction": "Chez DiagnoCare, la protection de vos données personnelles et de santé est notre priorité absolue. Cette politique de confidentialité décrit comment nous collectons, utilisons, stockons et protégeons vos informations lorsque vous utilisez notre plateforme d'aide au diagnostic basée sur l'intelligence artificielle.",
+      "sections": {
+        "data_collection": {
+          "title": "Données collectées",
+          "content": "Nous collectons les informations que vous fournissez lors de votre inscription (nom, prénom, adresse e-mail), les données de votre profil patient (âge, sexe, antécédents médicaux, pathologies chroniques, allergies et traitements en cours), les données de symptômes que vous saisissez lors de vos évaluations, ainsi que des données techniques de connexion (adresse IP, type de navigateur, système d'exploitation). Aucune donnée n'est collectée sans votre consentement explicite."
+        },
+        "data_usage": {
+          "title": "Utilisation des données",
+          "content": "Vos données sont utilisées exclusivement pour vous fournir le service DiagnoCare : analyse de symptômes, suivi d'évolution, et recommandations personnalisées. Nous utilisons des données anonymisées et agrégées pour améliorer nos algorithmes d'intelligence artificielle. Vos données personnelles ne sont jamais vendues ni partagées à des fins publicitaires."
+        },
+        "data_protection": {
+          "title": "Protection des données",
+          "content": "Toutes vos données sont chiffrées de bout en bout en utilisant des protocoles de sécurité de niveau médical (AES-256, TLS 1.3). Nos serveurs sont hébergés en Europe et conformes au RGPD. Des audits de sécurité réguliers sont effectués pour garantir la protection optimale de vos informations. L'accès aux données est strictement limité au personnel autorisé."
+        },
+        "data_sharing": {
+          "title": "Partage des données",
+          "content": "Vos données de santé ne sont jamais partagées avec des tiers sans votre consentement explicite. Vous avez la possibilité d'exporter et de partager vos résultats d'évaluation avec votre médecin traitant. En cas de demande légale, nous pouvons être amenés à communiquer certaines informations aux autorités compétentes dans le respect de la législation en vigueur."
+        },
+        "your_rights": {
+          "title": "Vos droits",
+          "content": "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données personnelles. Vous pouvez exercer ces droits à tout moment depuis les paramètres de votre compte ou en nous contactant directement. Vous avez également le droit de retirer votre consentement au traitement de vos données à tout moment."
+        },
+        "data_retention": {
+          "title": "Durée de conservation",
+          "content": "Vos données personnelles sont conservées pendant toute la durée de votre utilisation du service. En cas de suppression de votre compte, vos données sont définitivement supprimées de nos serveurs dans un délai de 30 jours. Les données anonymisées utilisées à des fins statistiques et d'amélioration des algorithmes peuvent être conservées au-delà de cette période."
+        }
+      },
+      "contact": {
+        "title": "Délégué à la protection des données",
+        "content": "Pour toute question relative à la protection de vos données personnelles, vous pouvez contacter notre Délégué à la Protection des Données (DPO) à l'adresse dpo@diagnocare.com ou par courrier à l'adresse indiquée dans les mentions légales de notre site."
+      }
     }
   }
 }

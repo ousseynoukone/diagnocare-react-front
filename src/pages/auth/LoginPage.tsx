@@ -33,7 +33,8 @@ export default function LoginPage() {
         
         mutate(loginDto, {
             onSuccess: (data: any) => {
-                const user = toUserProfileDTO(data.user);
+                const rawUser = data.user ?? data;
+                const user = toUserProfileDTO(rawUser);
                 setUser(user);
                 navigate('/dashboard');
             },

@@ -28,6 +28,8 @@ export default function RegisterPage() {
             password: data.password,
             roleId: Role.PATIENT, 
             lang: getBrowserLang(),
+            termsAccepted: data.termsAccepted,
+            privacyPolicyAccepted: data.privacyPolicyAccepted,
         };
 
         mutate(registerDto, {
@@ -167,6 +169,61 @@ export default function RegisterPage() {
                                 {errors.password.message as string}
                             </span>
                         )}
+                    </div>
+
+                    {/* Terms & Privacy Checkboxes */}
+                    <div className="space-y-3 pt-1">
+                        {/* Terms of Service */}
+                        <div className="space-y-1">
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <input
+                                    id="termsAccepted"
+                                    type="checkbox"
+                                    disabled={isPending}
+                                    className={`mt-0.5 h-4 w-4 rounded border text-primary focus:ring-primary/30 focus:ring-2 cursor-pointer transition-colors disabled:opacity-60 ${errors.termsAccepted ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'}`}
+                                    {...register("termsAccepted", {
+                                        required: t('auth.register.terms_required')
+                                    })}
+                                />
+                                <span className="text-xs leading-5 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                                    {t('auth.register.terms_label')}{' '}
+                                    <Link to="/terms" target="_blank" className="text-primary hover:underline font-medium">
+                                        {t('auth.register.terms_link')}
+                                    </Link>
+                                </span>
+                            </label>
+                            {errors.termsAccepted && (
+                                <span className="text-red-500 text-xs ml-7 block">
+                                    {errors.termsAccepted.message as string}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Privacy Policy */}
+                        <div className="space-y-1">
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <input
+                                    id="privacyPolicyAccepted"
+                                    type="checkbox"
+                                    disabled={isPending}
+                                    className={`mt-0.5 h-4 w-4 rounded border text-primary focus:ring-primary/30 focus:ring-2 cursor-pointer transition-colors disabled:opacity-60 ${errors.privacyPolicyAccepted ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'}`}
+                                    {...register("privacyPolicyAccepted", {
+                                        required: t('auth.register.privacy_required')
+                                    })}
+                                />
+                                <span className="text-xs leading-5 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                                    {t('auth.register.privacy_label')}{' '}
+                                    <Link to="/privacy" target="_blank" className="text-primary hover:underline font-medium">
+                                        {t('auth.register.privacy_link')}
+                                    </Link>
+                                </span>
+                            </label>
+                            {errors.privacyPolicyAccepted && (
+                                <span className="text-red-500 text-xs ml-7 block">
+                                    {errors.privacyPolicyAccepted.message as string}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Submit Button */}
