@@ -20,10 +20,11 @@ export const useUserStore = create<UserStore>()(
                 try {
                     // Ask the server to clear the HttpOnly cookies
                     await apiClient.post('/auth/logout', {});
-                } catch (_) {
-                    // Even if the request fails, clear local state
-                } finally {
+                    // Only clear local state if the request is successful
                     set({ user: null });
+                } catch (error) {
+                    console.error("Failed to log out from server:", error);
+                    throw error;
                 }
             },
         }),
