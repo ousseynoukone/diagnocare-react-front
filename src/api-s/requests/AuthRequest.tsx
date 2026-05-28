@@ -1,19 +1,13 @@
-import type { LoginDTO, RegisterDTO, OtpSendDTO, OtpValidateDTO, RefreshTokenDTO, ResetPasswordDTO } from "../../types/models/Auth";
+import type { LoginDTO, RegisterDTO, OtpSendDTO, OtpValidateDTO, ResetPasswordDTO } from "../../types/models/Auth";
 import { apiClient } from '../AxiosApiClient';
 
-// Authenticate user and store JWT token in localStorage
+// Authenticate user — tokens are set as HttpOnly cookies by the server
 export function AuthRequest(login: LoginDTO) {
     return apiClient.post('/auth/login', login)
         .then(response => {
+            // Response body only contains { user: {...} }
+            // Tokens are in HttpOnly cookies — inaccessible to JS
             const payload = response.data.data ?? response.data;
-            const token = payload.token;
-            const refreshToken = payload.refreshToken;
-            if (token) {
-                localStorage.setItem('token', token);
-            }
-            if (refreshToken) {
-                localStorage.setItem('refreshToken', refreshToken);
-            }
             return payload;
         })
         .catch(error => {
@@ -58,20 +52,11 @@ export function ValidateOtpRequest(otpData: OtpValidateDTO) {
         });
 }
 
-// Refresh the access token using a refresh token
-export function RefreshTokenRequest(refreshTokenData: RefreshTokenDTO) {
-    return apiClient.post('/auth/refresh-token', refreshTokenData)
+// Refresh the access token — no body needed, the browser sends the refreshToken cookie automatically
+export function RefreshTokenRequest() {
+    return apiClient.post('/auth/refresh-token', {})
         .then(response => {
-            const payload = response.data.data ?? response.data;
-            const token = payload.token;
-            const refreshToken = payload.refreshToken;
-            if (token) {
-                localStorage.setItem('token', token);
-            }
-            if (refreshToken) {
-                localStorage.setItem('refreshToken', refreshToken);
-            }
-            return payload;
+            return response.data;
         })
         .catch(error => {
             console.error('Token refresh failed:', error);
@@ -100,3 +85,11 @@ export function ResetPasswordConfirmRequest(resetData: ResetPasswordDTO) {
         });
 }
 
+// Logout — asks the server to clear the HttpOnly cookies
+export function LogoutRequest() {
+    return apiClient.post('/auth/logout', {})
+        .catch(error => {
+            console.error('Logout failed:', error);
+            throw error;
+        });
+}

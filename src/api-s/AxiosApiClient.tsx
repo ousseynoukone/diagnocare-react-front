@@ -1,21 +1,18 @@
 import axios from 'axios';
 import { useUserStore } from '../store/UserStore';
 
-
-const apiBaseUrl = import.meta.env.REACT_APP_API_BASE_URL  || 'http://localhost:8765/api/v1';
-
+const apiBaseUrl = import.meta.env.REACT_APP_API_BASE_URL || 'http://localhost:8765/api/v1';
 
 export const apiClient = axios.create({
   baseURL: apiBaseUrl,
+  // Required: tells the browser to send cookies (HttpOnly) with every cross-origin request
+  withCredentials: true,
 });
 
-// ─── Request interceptor: attach JWT token ───────────────────────────────────
+// ─── Request interceptor: set Content-Type ───────────────────────────────────
+// No manual token reading needed — the browser attaches the HttpOnly cookie automatically.
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.authorization = `Bearer ${token}`;
-    }
     config.headers['Content-Type'] = 'application/json';
     return config;
   },
@@ -28,32 +25,30 @@ apiClient.interceptors.request.use(
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (token: string) => void;
+  resolve: (value: unknown) => void;
   reject: (error: any) => void;
 }> = [];
 
 /**
  * Process queued requests that were waiting for the token refresh.
  */
-function processQueue(error: any, token: string | null = null) {
+function processQueue(error: any) {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
       reject(error);
     } else {
-      resolve(token!);
+      resolve(undefined); // requests will retry — the cookie is already updated by the server
     }
   });
   failedQueue = [];
 }
 
 /**
- * Clear all auth data and redirect to login.
+ * Clear user state and redirect to login.
+ * The server already cleared the HttpOnly cookies via the /auth/logout endpoint.
  */
 function forceLogout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('refreshToken');
   useUserStore.getState().clearUser();
-  // Redirect to login — only if not already there to avoid loops
   if (!window.location.pathname.startsWith('/login')) {
     window.location.href = '/login';
   }
@@ -71,15 +66,12 @@ apiClient.interceptors.response.use(
 
     // Don't intercept auth endpoints — avoid infinite loops
     const url = originalRequest.url || '';
-    if (url.includes('/auth/login') || url.includes('/auth/refresh-token') || url.includes('/auth/register')) {
-      return Promise.reject(error);
-    }
-
-    const refreshToken = localStorage.getItem('refreshToken');
-
-    // No refresh token available — force logout
-    if (!refreshToken) {
-      forceLogout();
+    if (
+      url.includes('/auth/login') ||
+      url.includes('/auth/refresh-token') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/logout')
+    ) {
       return Promise.reject(error);
     }
 
@@ -87,10 +79,7 @@ apiClient.interceptors.response.use(
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
-          resolve: (newToken: string) => {
-            originalRequest.headers.authorization = `Bearer ${newToken}`;
-            resolve(apiClient(originalRequest));
-          },
+          resolve: () => resolve(apiClient(originalRequest)),
           reject,
         });
       });
@@ -101,35 +90,25 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const response = await axios.post(
+      // No body needed — the browser sends the refreshToken HttpOnly cookie automatically
+      await axios.post(
         `${apiBaseUrl}/auth/refresh-token`,
-        { refreshToken },
-        { headers: { 'Content-Type': 'application/json' } }
+        {},
+        { withCredentials: true, headers: { 'Content-Type': 'application/json' } }
       );
 
-      const payload = response.data.data ?? response.data;
-      const newToken = payload.token;
-      const newRefreshToken = payload.refreshToken;
+      // The server has now set fresh HttpOnly cookies.
+      // Retry all queued requests — they will automatically use the new cookie.
+      processQueue(null);
 
-      if (!newToken) {
-        throw new Error('No token in refresh response');
-      }
-
-      // Store new tokens
-      localStorage.setItem('token', newToken);
-      if (newRefreshToken) {
-        localStorage.setItem('refreshToken', newRefreshToken);
-      }
-
-      // Retry all queued requests with the new token
-      processQueue(null, newToken);
-
-      // Retry the original request
-      originalRequest.headers.authorization = `Bearer ${newToken}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
-      // Refresh failed — force logout
-      processQueue(refreshError, null);
+      // Refresh failed — clear user state and redirect to login
+      processQueue(refreshError);
+      // Ask the server to clear the cookies too
+      try {
+        await axios.post(`${apiBaseUrl}/auth/logout`, {}, { withCredentials: true });
+      } catch (_) { /* best-effort */ }
       forceLogout();
       return Promise.reject(refreshError);
     } finally {

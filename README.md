@@ -1,73 +1,68 @@
-# React + TypeScript + Vite
+# 🩺 Diagnocare – React Frontend Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive, high-performance web interface built for the Diagnocare Healthcare platform.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Technology Stack
 
-## React Compiler
+* **Core Framework:** React 19 (Functional Components, Hooks)
+* **Build System:** Vite (Fast Refresh / HMR)
+* **Language:** TypeScript (Type-safe models and API integration)
+* **Styling:** Tailwind CSS v4 (Modern utility-first styling) & Vanilla CSS overrides
+* **Icons:** Lucide React
+* **State Management:** Zustand (Persisted stores)
+* **Data Fetching:** TanStack React Query (Automatic caching and mutation state)
+* **Form Handling:** React Hook Form
+* **HTTP Client:** Axios (With interceptors and credentials support)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🔐 Cookie-Based Authentication Integration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+To guard against Cross-Site Scripting (XSS) tokens are not stored in local storage or read by JavaScript. Instead, the application relies entirely on secure **HttpOnly cookies** issued by the backend gateway.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Key Implementation Details:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Axios Client Configuration (`AxiosApiClient.tsx`):**
+   * The global `apiClient` instance has `withCredentials: true` enabled.
+   * This forces the browser to automatically attach local cookies (such as `token` and `refreshToken`) to outgoing API requests and save new cookies sent by `Set-Cookie` response headers.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2. **State Management (`UserStore.ts`):**
+   * Local storage is only used to persist user profile metadata (e.g. name, email, roles) in the `diagnocare-user` store for rendering UI elements.
+   * Authentication secrets (JWTs) remain hidden from JavaScript.
+   * Triggering `logout()` sends a request to the backend `/auth/logout` endpoint which prompts the browser to clear the HttpOnly cookies, and then resets local UI states.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3. **Interceptor Refresh Mechanism:**
+   * If an API request fails with a `401 Unauthorized` status (due to an expired access token), the interceptor catches it.
+   * It attempts to hit `/auth/refresh-token` in the background (which succeeds if the long-lived `refreshToken` cookie is valid).
+   * Once refreshed, it automatically retries the failed request, preventing session disruption.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## ⚙️ Running Locally
+
+### 🐳 Prerequisites
+Ensure you have Node.js (v18+) and npm installed.
+
+### 🚀 Get Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env` file in the root directory:
+   ```env
+   VITE_API_BASE_URL=http://localhost:8765/api/v1
+   ```
+
+3. Spin up the Vite development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Build for production:
+   ```bash
+   npm run build
+   ```
