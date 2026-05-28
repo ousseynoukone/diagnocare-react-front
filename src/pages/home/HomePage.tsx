@@ -28,7 +28,7 @@ export function HomePage() {
           <div className="mx-auto max-w-2xl lg:max-w-none">
             <div className="flex flex-col items-center text-center space-y-10">
               <div className="flex flex-col items-center gap-10">
-                <div className='rounded-full m-2 bg-slate-200 p-2 w-24 h-24 mx-auto flex items-center justify-center dark:bg-slate-800'>
+                <div className='rounded-full m-2 bg-slate-200 p-2 w-24 h-24 mx-auto flex items-center justify-center dark:bg-slate-200'>
                   <img src={heroImg} alt="DiagnoCare illustration" className="h-14 w-14 object-contain" />
                 </div>
                 <h1 className="text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl max-w-3xl">
@@ -64,7 +64,7 @@ export function HomePage() {
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-sky-100 dark:bg-slate-800">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-sky-100 dark:bg-slate-200">
                 <Zap className="h-7 w-7 text-sky-600 dark:text-sky-400" strokeWidth={1.5} />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t('features.analysis.title')}</h3>
@@ -73,7 +73,7 @@ export function HomePage() {
               </p>
             </article>
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-emerald-100 dark:bg-slate-800">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-emerald-100 dark:bg-slate-200">
                 <img src={signalImg} alt="Suivi d'évolution" className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t('features.evolution.title')}</h3>
@@ -82,7 +82,7 @@ export function HomePage() {
               </p>
             </article>
             <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-violet-100 dark:bg-slate-800">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded bg-violet-100 dark:bg-slate-200">
                 <img src={confidentialImg} alt="Confidentialité totale" className="h-7 w-7" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t('features.confidentiality.title')}</h3>
