@@ -160,7 +160,7 @@ export default function ResetPasswordPage() {
                                         type="button"
                                         disabled={resendCooldown > 0 || isRequesting || isConfirming}
                                         onClick={handleResend}
-                                        className="text-xs text-primary hover:text-primary-dark font-medium transition-colors disabled:text-slate-400 disabled:cursor-not-allowed hover:underline flex items-center gap-1 cursor-pointer"
+                                        className="text-xs text-primary hover:text-primary-dark dark:text-primary-400 font-medium transition-colors disabled:text-slate-400 disabled:cursor-not-allowed hover:underline flex items-center gap-1 cursor-pointer"
                                     >
                                         <RefreshCw className={`h-3 w-3 ${isRequesting ? 'animate-spin' : ''}`} />
                                         {resendCooldown > 0 
@@ -275,7 +275,7 @@ export default function ResetPasswordPage() {
                     {/* Links */}
                     <div className="flex flex-col items-center gap-2 pt-2 text-center">
                         <span className="text-sm text-slate-500 dark:text-slate-400">
-                            <Link to="/login" className="text-primary hover:underline cursor-pointer font-medium">
+                            <Link to="/login" className="text-primary dark:text-primary-400 hover:underline cursor-pointer font-medium">
                                 {t('auth.reset_password.back_to_login')}
                             </Link>
                         </span>

@@ -185,9 +185,9 @@ export default function RegisterPage() {
                                         required: t('auth.register.terms_required')
                                     })}
                                 />
-                                <span className="text-xs leading-5 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                                <span className="text-xs leading-5  dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
                                     {t('auth.register.terms_label')}{' '}
-                                    <Link to="/terms" target="_blank" className="text-primary hover:underline font-medium">
+                                    <Link to="/terms" target="_blank" className="text-primary dark:text-primary-400 hover:underline font-medium">
                                         {t('auth.register.terms_link')}
                                     </Link>
                                 </span>
@@ -211,9 +211,9 @@ export default function RegisterPage() {
                                         required: t('auth.register.privacy_required')
                                     })}
                                 />
-                                <span className="text-xs leading-5 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                                <span className="text-xs leading-5  dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
                                     {t('auth.register.privacy_label')}{' '}
-                                    <Link to="/privacy" target="_blank" className="text-primary hover:underline font-medium">
+                                    <Link to="/privacy" target="_blank" className="text-primary dark:text-primary-400 hover:underline font-medium">
                                         {t('auth.register.privacy_link')}
                                     </Link>
                                 </span>
