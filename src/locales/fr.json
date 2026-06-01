@@ -240,5 +240,62 @@
         "content": "Pour toute question relative à la protection de vos données personnelles, vous pouvez contacter notre Délégué à la Protection des Données (DPO) à l'adresse dpo@diagnocare.com ou par courrier à l'adresse indiquée dans les mentions légales de notre site."
       }
     }
+  },
+  "dashboard": {
+    "sidebar": {
+      "accueil": "Accueil",
+      "evaluation": "Évaluation",
+      "suivis": "Suivis",
+      "historique": "Historique",
+      "resume": "Résumé",
+      "profil": "Profil médical",
+      "parametres": "Paramètres",
+      "logout": "Déconnexion"
+    },
+    "pages": {
+      "evaluation": {
+        "title": "Nouvelle Évaluation",
+        "description": "Commencez une nouvelle analyse de vos symptômes assistée par notre intelligence artificielle.",
+        "card_title": "Prêt à commencer ?",
+        "card_desc": "L'évaluation prend environ 3 minutes. Veuillez répondre honnêtement aux questions pour obtenir des hypothèses précises.",
+        "start_button": "Lancer l'évaluation"
+      },
+      "suivis": {
+        "title": "Suivis d'évolution",
+        "description": "Suivez l'évolution de vos symptômes déclarés et observez leur amélioration ou aggravation.",
+        "card_title": "Aucun suivi actif",
+        "card_desc": "Vous n'avez pas d'évaluation récente nécessitant un suivi particulier. Les suivis s'activent après une évaluation de symptômes."
+      },
+      "historique": {
+        "title": "Historique",
+        "description": "Consultez toutes vos évaluations médicales précédentes.",
+        "card_title": "Aucune évaluation enregistrée",
+        "card_desc": "Votre historique est vide pour le moment. Réalisez votre première évaluation pour l'enregistrer ici."
+      },
+      "resume": {
+        "title": "Résumé Médical",
+        "description": "Un résumé consolidé de votre profil de santé, prêt à être partagé avec votre médecin traitant.",
+        "card_title": "Résumé non généré",
+        "card_desc": "Veuillez compléter au moins une évaluation de symptômes et configurer votre profil médical pour obtenir un résumé médical."
+      },
+      "profil": {
+        "title": "Profil médical",
+        "description": "Gérez vos informations personnelles et de santé pour améliorer la pertinence de l'analyse de l'IA.",
+        "patient_badge": "Patient",
+        "info_title": "Informations de base",
+        "first_name": "Prénom",
+        "last_name": "Nom",
+        "email": "Email"
+      },
+      "parametres": {
+        "title": "Paramètres",
+        "description": "Gérez l'affichage de l'application, vos préférences linguistiques et de sécurité.",
+        "pref_title": "Préférences de l'application",
+        "theme_label": "Mode d'affichage",
+        "theme_desc": "Basculez entre le mode clair et le mode sombre.",
+        "lang_label": "Langue",
+        "lang_desc": "Sélectionnez votre langue de préférence."
+      }
+    }
   }
 }

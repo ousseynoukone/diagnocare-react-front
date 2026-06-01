@@ -240,5 +240,62 @@
         "content": "For any questions regarding the protection of your personal data, you can contact our Data Protection Officer (DPO) at dpo@diagnocare.com or by mail at the address indicated in the legal notices on our website."
       }
     }
+  },
+  "dashboard": {
+    "sidebar": {
+      "accueil": "Home",
+      "evaluation": "Evaluation",
+      "suivis": "Follow-ups",
+      "historique": "History",
+      "resume": "Summary",
+      "profil": "Medical Profile",
+      "parametres": "Settings",
+      "logout": "Sign Out"
+    },
+    "pages": {
+      "evaluation": {
+        "title": "New Evaluation",
+        "description": "Start a new symptom analysis assisted by our artificial intelligence.",
+        "card_title": "Ready to start?",
+        "card_desc": "The evaluation takes about 3 minutes. Please answer honestly to get accurate hypotheses.",
+        "start_button": "Start Evaluation"
+      },
+      "suivis": {
+        "title": "Evolution Tracking",
+        "description": "Track the evolution of your declared symptoms and observe their improvement or worsening.",
+        "card_title": "No active tracking",
+        "card_desc": "You do not have any recent evaluations requiring specific follow-up. Tracking is activated after a symptom evaluation."
+      },
+      "historique": {
+        "title": "History",
+        "description": "View all your previous medical evaluations.",
+        "card_title": "No evaluations recorded",
+        "card_desc": "Your history is currently empty. Complete your first evaluation to save it here."
+      },
+      "resume": {
+        "title": "Medical Summary",
+        "description": "A consolidated summary of your health profile, ready to be shared with your attending doctor.",
+        "card_title": "Summary not generated",
+        "card_desc": "Please complete at least one symptom evaluation and configure your medical profile to obtain a medical summary."
+      },
+      "profil": {
+        "title": "Medical Profile",
+        "description": "Manage your personal and health information to improve the relevance of the AI analysis.",
+        "patient_badge": "Patient",
+        "info_title": "Basic Information",
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email"
+      },
+      "parametres": {
+        "title": "Settings",
+        "description": "Manage application display, language preferences, and security.",
+        "pref_title": "Application Preferences",
+        "theme_label": "Display Mode",
+        "theme_desc": "Switch between light and dark mode.",
+        "lang_label": "Language",
+        "lang_desc": "Select your preferred language."
+      }
+    }
   }
 }
