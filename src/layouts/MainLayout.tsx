@@ -1,6 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom'
 import Footer from '../components/footer/Footer'
 import { useUserStore } from '../store/UserStore'
+import SideBar from '../components/head/SideBar';
 
 
 
@@ -13,13 +14,19 @@ export default function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       
+      <main>
+        <div className="flex">
+        <SideBar />
 
-      <main className="flex-1 mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="flex-1 p-4">
+            
+            <Outlet />
 
-        <Outlet />
+          </div>
 
+        </div>
       </main>
 
       <Footer />

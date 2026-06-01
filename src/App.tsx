@@ -11,9 +11,10 @@ import VerifyEmailPage from './pages/auth/VerifyEmailPage'
 import TermsOfServicePage from './pages/legal/TermsOfServicePage'
 import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
 import { Toaster } from 'sonner'
+import DashboardPage from './pages/dashboard/dashboard'
 
 function App() {
-  return (
+  return ( 
     <BrowserRouter>
       <Routes>
         <Route element={<PublicLayout />}>
@@ -31,7 +32,7 @@ function App() {
         </Route>
 
         <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<h1>Dashboard page</h1>} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
       </Routes>
       

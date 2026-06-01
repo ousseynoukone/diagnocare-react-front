@@ -1,5 +1,5 @@
 import { Outlet, Navigate } from 'react-router-dom'
-import NavBar from '../components/public-components/NavBar'
+import NavBar from '../components/head/NavBar'
 import Footer from '../components/footer/Footer'
 import { useUserStore } from '../store/UserStore'
 
