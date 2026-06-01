@@ -25,7 +25,7 @@ export default function NavBar() {
       <div className="mx-auto max-w-8xl px-2 py-2 sm:px-6 lg:px-8 flex items-center justify-between">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 text-background-900 dark:text-background-550">
+        <Link to="/" className="flex items-center gap-2 text-background-900 dark:text-white">
           <img src={logo} alt="DiagnoCare Logo" className="h-12 w-auto translate-y-1.5" />
           <span className="text-xl font-bold">DiagnoCare</span>
         </Link>

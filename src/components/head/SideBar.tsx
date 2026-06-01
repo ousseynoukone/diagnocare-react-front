@@ -14,6 +14,7 @@ import {
 import { useUserStore } from '../../store/UserStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import logoBlue from '../../assets/logo-blue.png';
 
 export default function SideBar() {
   const { t } = useTranslation();
@@ -69,10 +70,8 @@ export default function SideBar() {
       {/* Top Part: Logo & Menu */}
       <div className="space-y-8">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-2">
-          <div className="bg-primary p-2 rounded-xl text-white flex items-center justify-center shadow-lg shadow-primary/30">
-            <Activity className="h-6 w-6 stroke-[2.5]" />
-          </div>
+        <div className="flex items-center gap-3 px-2 cursor-pointer" onClick={() => navigate('/home')}>
+          <img src={logoBlue} alt="DiagnoCare Logo" className="h-12 w-auto translate-y-1.5" />
           <span className="text-xl font-bold tracking-tight text-white">DiagnoCare</span>
         </div>
 
@@ -131,10 +130,8 @@ export default function SideBar() {
     <>
       {/* Mobile Top Header (only visible on mobile screens) */}
       <div className="md:hidden flex items-center justify-between bg-[#0B0F19] text-white px-4 py-3 sticky top-0 z-40 border-b border-slate-800 w-full">
-        <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg text-white flex items-center justify-center">
-            <Activity className="h-5 w-5 stroke-[2.5]" />
-          </div>
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/home')}>
+          <img src={logoBlue} alt="DiagnoCare Logo" className="h-10 w-auto translate-y-1" />
           <span className="font-bold tracking-tight">DiagnoCare</span>
         </div>
         <button
