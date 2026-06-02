@@ -14,10 +14,10 @@ export default function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen  flex flex-col">
-      <div className="flex flex-1 flex-col md:flex-row">
+    <div className="h-screen flex flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
         <SideBar />
-        <main className="flex-1 flex flex-col min-w-0 bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+        <main className="flex-1 flex flex-col min-w-0 bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 overflow-y-auto">
           <div className="flex-1 p-6 md:p-8">
             <Outlet />
           </div>

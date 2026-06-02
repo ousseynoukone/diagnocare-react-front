@@ -252,6 +252,50 @@
       "parametres": "Settings",
       "logout": "Sign Out"
     },
+    "home": {
+      "title": "Dashboard",
+      "subtitle": "Welcome {{name}}, here is your health overview for the day.",
+      "my_account": "My Account",
+      "last_updated": "Last updated: just now",
+      "stats": {
+        "evaluations": {
+          "label": "Total evaluations",
+          "value": "12",
+          "subtext": "+2 this month"
+        },
+        "alerts": {
+          "label": "Active alerts",
+          "value": "1",
+          "subtext": "Action required"
+        },
+        "next_followup": {
+          "label": "Next follow-up",
+          "value": "24h",
+          "subtext": "Seasonal flu"
+        }
+      },
+      "emergency_banner": {
+        "title": "Warning: Situation requiring prompt attention",
+        "description": "Based on your symptoms, an urgent medical consultation is recommended. Do not rely solely on this application. In case of doubt or life-threatening emergency, immediately contact emergency services (112 / 911) or go to the emergency room.",
+        "button": "Call Emergency"
+      },
+      "actions": {
+        "new_evaluation": {
+          "title": "New evaluation",
+          "description": "Launch a complete analysis of your symptoms assisted by AI."
+        },
+        "follow_up": {
+          "title": "Follow up",
+          "description": "Update the evolution of your recent symptoms."
+        }
+      },
+      "recent_evaluations": {
+        "title": "Recent evaluations",
+        "view_all": "View all history",
+        "confidence": "Confidence",
+        "attention_required": "Attention required"
+      }
+    },
     "pages": {
       "evaluation": {
         "title": "New Evaluation",

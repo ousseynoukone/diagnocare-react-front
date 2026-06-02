@@ -166,7 +166,7 @@ export default function SideBar() {
       )}
 
       {/* Desktop Sidebar (hidden on mobile, visible on medium screens and up) */}
-      <aside className="hidden md:block w-72 h-screen sticky top-0 flex-shrink-0 z-30">
+      <aside className="hidden md:block w-72 h-screen sticky top-0 flex-shrink-0 z-30 overflow-y-auto">
         <SidebarContent />
       </aside>
     </>

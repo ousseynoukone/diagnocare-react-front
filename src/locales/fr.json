@@ -252,6 +252,50 @@
       "parametres": "Paramètres",
       "logout": "Déconnexion"
     },
+    "home": {
+      "title": "Tableau de bord",
+      "subtitle": "Bienvenue {{name}}, voici votre aperçu santé du jour.",
+      "my_account": "Mon Compte",
+      "last_updated": "Dernière màj: à l'instant",
+      "stats": {
+        "evaluations": {
+          "label": "Total évaluations",
+          "value": "12",
+          "subtext": "+2 ce mois-ci"
+        },
+        "alerts": {
+          "label": "Alertes actives",
+          "value": "1",
+          "subtext": "Action requise"
+        },
+        "next_followup": {
+          "label": "Prochain suivi",
+          "value": "24h",
+          "subtext": "Grippe saisonnière"
+        }
+      },
+      "emergency_banner": {
+        "title": "Attention : Situation nécessitant une prise en charge rapide",
+        "description": "D'après vos symptômes, une consultation médicale urgente est recommandée. Ne vous fiez pas uniquement à cette application. En cas de doute ou d'urgence vitale, contactez immédiatement le 15 (SAMU) ou rendez-vous aux urgences.",
+        "button": "Appeler le 15"
+      },
+      "actions": {
+        "new_evaluation": {
+          "title": "Nouvelle évaluation",
+          "description": "Lancez une analyse complète de vos symptômes assistée par IA."
+        },
+        "follow_up": {
+          "title": "Faire un suivi",
+          "description": "Mettez à jour l'évolution de vos symptômes récents."
+        }
+      },
+      "recent_evaluations": {
+        "title": "Évaluations récentes",
+        "view_all": "Voir tout l'historique",
+        "confidence": "Confiance",
+        "attention_required": "Attention requise"
+      }
+    },
     "pages": {
       "evaluation": {
         "title": "Nouvelle Évaluation",
