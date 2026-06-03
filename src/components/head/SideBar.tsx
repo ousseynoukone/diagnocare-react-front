@@ -1,12 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  Home, 
-  Activity, 
-  Clock, 
-  FileText, 
-  ClipboardList, 
-  User, 
-  Settings, 
+import {
+  Home,
+  Activity,
+  Clock,
+  FileText,
+  ClipboardList,
+  User,
+  Settings,
   LogOut,
   Menu,
   X
@@ -14,7 +14,7 @@ import {
 import { useUserStore } from '../../store/UserStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import logoBlue from '../../assets/logo-blue.png';
+import logoBlue from '../../assets/logo-blue.svg';
 
 export default function SideBar() {
   const { t } = useTranslation();
@@ -56,12 +56,12 @@ export default function SideBar() {
   };
 
   const getFullName = () => {
-    if (!user) return 'Jean Dupont';
+    if (!user) return 'Unknown User';
     return `${user.firstName} ${user.lastName}`;
   };
 
   const getEmail = () => {
-    if (!user) return 'jean.dupont@email.com';
+    if (!user) return 'Unknown email';
     return user.email;
   };
 
@@ -71,7 +71,7 @@ export default function SideBar() {
       <div className="space-y-8">
         {/* Logo */}
         <div className="flex items-center gap-3 px-2 cursor-pointer" onClick={() => navigate('/home')}>
-          <img src={logoBlue} alt="DiagnoCare Logo" className="h-12 w-auto translate-y-1.5" />
+          <img src={logoBlue} alt="DiagnoCare Logo" className="h-12 w-auto " />
           <span className="text-xl font-bold tracking-tight text-white">DiagnoCare</span>
         </div>
 
@@ -86,10 +86,9 @@ export default function SideBar() {
                 end={item.end}
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer ${
-                    isActive
-                      ? 'bg-primary text-white shadow-md shadow-primary/30 font-semibold'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer ${isActive
+                    ? 'bg-primary text-white shadow-md shadow-primary/30 font-semibold'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                   }`
                 }
               >

@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Fond bleu arrondi -->
   <rect x="32" y="32" width="448" height="448" rx="110" fill="#2563eb" />
   
-  <!-- Ligne de pulsation blanche -->
   <path d="M 140 256 
            L 185 256 
            C 195 256, 200 250, 205 235 

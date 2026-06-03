@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import logo from '../../assets/logo-blue.png';
+import logo from '../../assets/logo-blue.svg';
 import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, RefreshCw, KeyRound, Lock, Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -98,8 +98,8 @@ export default function ResetPasswordPage() {
                     {t('auth.reset_password.title')}
                 </h1>
                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                    {step === 1 
-                        ? t('auth.reset_password.subtitle') 
+                    {step === 1
+                        ? t('auth.reset_password.subtitle')
                         : t('auth.reset_password.subtitle_step2')
                     }
                 </span>
@@ -154,7 +154,7 @@ export default function ResetPasswordPage() {
                                     <label htmlFor="code" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                                         {t('auth.reset_password.code_label')}
                                     </label>
-                                    
+
                                     {/* Resend button with countdown */}
                                     <button
                                         type="button"
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
                                         className="text-xs text-primary hover:text-primary-dark dark:text-primary-400 font-medium transition-colors disabled:text-slate-400 disabled:cursor-not-allowed hover:underline flex items-center gap-1 cursor-pointer"
                                     >
                                         <RefreshCw className={`h-3 w-3 ${isRequesting ? 'animate-spin' : ''}`} />
-                                        {resendCooldown > 0 
+                                        {resendCooldown > 0
                                             ? t('auth.reset_password.resend_cooldown', { seconds: resendCooldown })
                                             : t('auth.reset_password.resend_code')
                                         }
@@ -258,13 +258,13 @@ export default function ResetPasswordPage() {
                     )}
 
                     {/* Submit Button */}
-                    <Button 
+                    <Button
                         type="submit"
                         disabled={isRequesting || isConfirming}
                         className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2 w-full flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <span>
-                            {step === 1 
+                            {step === 1
                                 ? (isRequesting ? "Envoi..." : t('auth.reset_password.submit_button'))
                                 : (isConfirming ? "Réinitialisation..." : t('auth.reset_password.submit_confirm_button'))
                             }

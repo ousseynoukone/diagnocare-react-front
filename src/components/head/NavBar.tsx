@@ -1,4 +1,4 @@
-import logo from '../../assets/logo-blue.png';
+import logo from '../../assets/logo-blue.svg';
 import ToggleDarkMode from '../basics/ToggleDarkMode';
 import { useState } from 'react';
 import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
@@ -26,7 +26,7 @@ export default function NavBar() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-background-900 dark:text-white">
-          <img src={logo} alt="DiagnoCare Logo" className="h-12 w-auto translate-y-1.5" />
+          <img src={logo} alt="DiagnoCare Logo" className="h-12 w-auto" />
           <span className="text-xl font-bold">DiagnoCare</span>
         </Link>
 

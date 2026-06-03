@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import logo from '../../assets/logo-blue.png';
+import logo from '../../assets/logo-blue.svg';
 import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useLogin } from '../../hooks/useAuth';
@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import { handleApiError } from '../../utils/errorHelper';
 import { useUserStore } from '../../store/UserStore';
 import { toUserProfileDTO } from '../../types/models/User';
-    
+
 export default function LoginPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function LoginPage() {
             email: email,
             password: password
         };
-        
+
         mutate(loginDto, {
             onSuccess: (data: any) => {
                 const rawUser = data.user ?? data;
@@ -44,8 +44,8 @@ export default function LoginPage() {
                     setGeneralError(
                         <span>
                             Votre adresse e-mail n'est pas validée.{" "}
-                            <Link 
-                                to={`/verify-email?email=${encodeURIComponent(email)}`} 
+                            <Link
+                                to={`/verify-email?email=${encodeURIComponent(email)}`}
                                 className="underline font-semibold hover:text-red-300 dark:hover:text-red-200"
                             >
                                 Cliquez ici pour activer votre compte.
@@ -60,11 +60,11 @@ export default function LoginPage() {
     };
 
 
-    return ( 
+    return (
 
         <div className="flex flex-col gap-6 max-w-md mx-auto w-full items-center justify-center min-h-[85vh] px-4 py-8">
             {/* Header / Logo */}
-            <div className="gap-3 mb-2 items-center flex flex-col text-center"> 
+            <div className="gap-3 mb-2 items-center flex flex-col text-center">
                 <img src={logo} alt="Login" className="h-16 w-16 drop-shadow-sm" />
                 <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{t('auth.login.title')}</h1>
                 <span className="text-sm text-slate-500 dark:text-slate-400">{t('auth.login.subtitle')}</span>
@@ -83,15 +83,15 @@ export default function LoginPage() {
                     {/* Email Input */}
                     <div className="space-y-1.5">
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.login.email_label')}</label>
-                        <input 
-                            id="email" 
-                            type="email" 
-                            placeholder={t('auth.login.email_placeholder')} 
-                            autoComplete="email" 
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder={t('auth.login.email_placeholder')}
+                            autoComplete="email"
                             disabled={isPending}
                             className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
-                            {...register("email", { 
-                                required: "L'adresse email est requise.", 
+                            {...register("email", {
+                                required: "L'adresse email est requise.",
                                 pattern: {
                                     value: /^\S+@\S+$/i,
                                     message: "Veuillez entrer une adresse e-mail valide."
@@ -109,15 +109,15 @@ export default function LoginPage() {
                     <div className="space-y-1.5">
                         <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.login.password_label')}</label>
                         <div className="relative mt-1">
-                            <input 
-                                id="password" 
-                                type={showPassword ? "text" : "password"} 
-                                placeholder={t('auth.login.password_placeholder')} 
-                                autoComplete="current-password" 
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder={t('auth.login.password_placeholder')}
+                                autoComplete="current-password"
                                 disabled={isPending}
                                 className={`w-full rounded-lg border pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
-                                {...register("password", { 
-                                    required: "Le mot de passe est requis." 
+                                {...register("password", {
+                                    required: "Le mot de passe est requis."
                                 })}
                             />
                             <button
@@ -137,8 +137,8 @@ export default function LoginPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         disabled={isPending}
                         className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2 disabled:opacity-60 disabled:cursor-not-allowed w-full flex items-center gap-2"
                     >
@@ -173,8 +173,8 @@ export default function LoginPage() {
                         <span className="text-sm text-slate-500 dark:text-slate-400">{t('auth.login.no_account')}{" "}
                             <Link to="/signup" className="text-primary dark:text-primary-400 hover:underline ps-1 cursor-pointer font-medium">{t('auth.login.register_free')}</Link>
                         </span>
-                        <Link 
-                            to={`/verify-email?email=${encodeURIComponent(watch("email") || '')}`} 
+                        <Link
+                            to={`/verify-email?email=${encodeURIComponent(watch("email") || '')}`}
                             className="text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary hover:underline cursor-pointer font-medium mt-1"
                         >
                             Activer mon compte (Code OTP)

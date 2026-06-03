@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import logo from '../../assets/logo-blue.png';
+import logo from '../../assets/logo-blue.svg';
 import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -128,7 +128,7 @@ export default function VerifyEmailPage() {
                             <label htmlFor="code" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                                 {t('auth.verify_email.code_label')}
                             </label>
-                            
+
                             {/* Resend button with countdown */}
                             <button
                                 type="button"
@@ -137,13 +137,13 @@ export default function VerifyEmailPage() {
                                 className="text-xs text-primary dark:text-primary-500 font-medium transition-colors disabled:text-slate-400 disabled:cursor-not-allowed hover:underline flex items-center gap-1 cursor-pointer"
                             >
                                 <RefreshCw className={`h-3 w-3 ${isResending ? 'animate-spin' : ''}`} />
-                                {resendCooldown > 0 
-                                    ? t('auth.verify_email.resend_cooldown', { seconds: resendCooldown }) 
+                                {resendCooldown > 0
+                                    ? t('auth.verify_email.resend_cooldown', { seconds: resendCooldown })
                                     : t('auth.verify_email.resend_code')
                                 }
                             </button>
                         </div>
-                        
+
                         <input
                             id="code"
                             type="text"

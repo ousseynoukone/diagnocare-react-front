@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import logo from '../../assets/logo-blue.png';
+import logo from '../../assets/logo-blue.svg';
 import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -26,7 +26,7 @@ export default function RegisterPage() {
             firstName: data.firstName,
             lastName: data.lastName,
             password: data.password,
-            roleId: Role.PATIENT, 
+            roleId: Role.PATIENT,
             lang: getBrowserLang(),
             termsAccepted: data.termsAccepted,
             privacyPolicyAccepted: data.privacyPolicyAccepted,
@@ -39,19 +39,19 @@ export default function RegisterPage() {
             },
             onError: (err: any) => {
                 handleApiError(
-                    err, 
-                    setError, 
-                    setGeneralError, 
+                    err,
+                    setError,
+                    setGeneralError,
                     "Une erreur est survenue lors de l'inscription."
                 );
             }
         });
     };
 
-    return ( 
+    return (
         <div className="flex flex-col gap-6 max-w-md mx-auto w-full items-center justify-center min-h-[85vh] px-4 py-8">
             {/* Header / Logo */}
-            <div className="gap-3 mb-2 items-center flex flex-col text-center"> 
+            <div className="gap-3 mb-2 items-center flex flex-col text-center">
                 <img src={logo} alt="Register" className="h-16 w-16 drop-shadow-sm" />
                 <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{t('auth.register.title')}</h1>
                 <span className="text-sm text-slate-500 dark:text-slate-400">{t('auth.register.subtitle')}</span>
@@ -74,13 +74,13 @@ export default function RegisterPage() {
                         {/* FirstName Input */}
                         <div className="space-y-1.5">
                             <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Prénom</label>
-                            <input 
-                                id="firstName" 
-                                type="text" 
-                                placeholder="Jean" 
+                            <input
+                                id="firstName"
+                                type="text"
+                                placeholder="Jean"
                                 disabled={isPending}
                                 className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.firstName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
-                                {...register("firstName", { 
+                                {...register("firstName", {
                                     required: "Le prénom est requis.",
                                     minLength: { value: 2, message: "Le prénom doit faire au moins 2 caractères." }
                                 })}
@@ -95,13 +95,13 @@ export default function RegisterPage() {
                         {/* LastName Input */}
                         <div className="space-y-1.5">
                             <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Nom</label>
-                            <input 
-                                id="lastName" 
-                                type="text" 
-                                placeholder="Dupont" 
+                            <input
+                                id="lastName"
+                                type="text"
+                                placeholder="Dupont"
                                 disabled={isPending}
                                 className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.lastName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
-                                {...register("lastName", { 
+                                {...register("lastName", {
                                     required: "Le nom est requis.",
                                     minLength: { value: 2, message: "Le nom doit faire au moins 2 caractères." }
                                 })}
@@ -117,15 +117,15 @@ export default function RegisterPage() {
                     {/* Email Input */}
                     <div className="space-y-1.5">
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.register.email_label')}</label>
-                        <input 
-                            id="email" 
-                            type="email" 
-                            placeholder={t('auth.register.email_placeholder')} 
-                            autoComplete="email" 
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder={t('auth.register.email_placeholder')}
+                            autoComplete="email"
                             disabled={isPending}
                             className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
-                            {...register("email", { 
-                                required: "L'adresse email est requise.", 
+                            {...register("email", {
+                                required: "L'adresse email est requise.",
                                 pattern: {
                                     value: /^\S+@\S+$/i,
                                     message: "Veuillez entrer une adresse e-mail valide."
@@ -143,14 +143,14 @@ export default function RegisterPage() {
                     <div className="space-y-1.5">
                         <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('auth.register.password_label')}</label>
                         <div className="relative mt-1">
-                            <input 
-                                id="password" 
-                                type={showPassword ? "text" : "password"} 
-                                placeholder={t('auth.login.password_placeholder')} 
-                                autoComplete="new-password" 
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder={t('auth.login.password_placeholder')}
+                                autoComplete="new-password"
                                 disabled={isPending}
                                 className={`w-full rounded-lg border pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
-                                {...register("password", { 
+                                {...register("password", {
                                     required: "Le mot de passe est requis.",
                                     minLength: { value: 8, message: "Le mot de passe doit comporter au moins 8 caractères." }
                                 })}
@@ -227,8 +227,8 @@ export default function RegisterPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         disabled={isPending}
                         className="bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer justify-center font-medium mt-2 disabled:opacity-60 disabled:cursor-not-allowed w-full flex items-center gap-2"
                     >
