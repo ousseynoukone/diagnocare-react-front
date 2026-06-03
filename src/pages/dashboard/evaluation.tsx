@@ -7,6 +7,8 @@ import AnalysisLoading from '../../components/dashboard/evaluation/AnalysisLoadi
 import EvaluationResult from '../../components/dashboard/evaluation/EvaluationResult';
 import SpecialistFinder from '../../components/dashboard/evaluation/SpecialistFinder';
 import type { Symptom, Doctor, PredictionResult } from '../../types/models/Evaluation';
+import { useEvaluationStore } from '../../store/EvaluationStore';
+import { EvaluationState } from '../../types/models/enums/EvaluationStateEnum';
 
 // Symptom data definition matching database labels
 const ALL_SYMPTOMS: Symptom[] = [
@@ -246,9 +248,15 @@ export default function EvaluationPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  // App state workflow: 'start' | 'selection' | 'loading' | 'result' | 'search_specialist'
-  const [step, setStep] = useState<'start' | 'selection' | 'loading' | 'result' | 'search_specialist'>('start');
+  const evaluationState = useEvaluationStore((state) => state.evaluationState)
+  const setEvaluationState = useEvaluationStore((state) => state.setEvaluationState)
+
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  
+  // Reset evaluation state to START on mount
+  useEffect(() => {
+    setEvaluationState(EvaluationState.START);
+  }, [setEvaluationState]);
   
   // Handle symptom toggling
   const toggleSymptom = (id: string) => {
@@ -260,28 +268,28 @@ export default function EvaluationPage() {
   // Trigger analysis state transition
   const handleStartAnalysis = () => {
     if (selectedSymptoms.length === 0) return;
-    setStep('loading');
+    setEvaluationState(EvaluationState.LOADING);
   };
 
   // Handle loading state timeout
   useEffect(() => {
-    if (step === 'loading') {
+    console.log("evaluationState: ", evaluationState)
+    if (evaluationState === EvaluationState.LOADING) {
       const timer = setTimeout(() => {
-        setStep('result');
-      }, 2000);
+        setEvaluationState(EvaluationState.RESULT);
+      }, 4000);
       return () => clearTimeout(timer);
     }
-  }, [step]);
-
+  }, [evaluationState]);
   // Compute prediction results based on selection
   const resultData = useMemo(() => getPredictionResult(selectedSymptoms), [selectedSymptoms]);
 
   return (
-    <div id="evaluation-page" className="space-y-6 max-w-6xl mx-auto pb-24 text-slate-800 dark:text-slate-100">
+    <div id="evaluation-page" className="space-y-6  max-w-6xl mx-auto pb-24 text-slate-800 dark:text-slate-100">
       
       {/* State 0: Welcome start view */}
-      {step === 'start' && (
-        <div className="space-y-6 max-w-4xl">
+      {evaluationState === EvaluationState.START && (
+        <div className="space-y-15 w-full">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               {t('dashboard.pages.evaluation.title', 'Nouvelle Évaluation')}
@@ -291,34 +299,36 @@ export default function EvaluationPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
-            <div className="flex flex-col items-center justify-center text-center p-8 space-y-6">
-              <div className="bg-primary-50 dark:bg-primary-950/40 p-4 rounded-full text-primary dark:text-primary-400">
-                <Activity className="h-12 w-12 stroke-[1.5]" />
+          <div className="flex justify-center w-full">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm max-w-2xl w-full">
+              <div className="flex flex-col items-center justify-center text-center p-8 space-y-6">
+                <div className="bg-primary-50 dark:bg-primary-950/40 p-4 rounded-full text-primary dark:text-primary-400">
+                  <Activity className="h-12 w-12 stroke-[1.5]" />
+                </div>
+                <div className="space-y-2 max-w-md">
+                  <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+                    {t('dashboard.pages.evaluation.card_title', 'Prêt à commencer ?')}
+                  </h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {t('dashboard.pages.evaluation.card_desc', "L'évaluation prend environ 3 minutes. Veuillez répondre honnêtement aux questions pour obtenir des hypothèses précises.")}
+                  </p>
+                </div>
+                <button 
+                  id="btn-start-evaluation"
+                  onClick={() => setEvaluationState(EvaluationState.SELECTION)}
+                  className="flex items-center gap-2 bg-primary hover:bg-primary-700 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-primary/25 transition-all duration-200 cursor-pointer"
+                >
+                  <Play className="h-4 w-4 fill-white" />
+                  {t('dashboard.pages.evaluation.start_button', "Lancer l'évaluation")}
+                </button>
               </div>
-              <div className="space-y-2 max-w-md">
-                <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
-                  {t('dashboard.pages.evaluation.card_title', 'Prêt à commencer ?')}
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {t('dashboard.pages.evaluation.card_desc', "L'évaluation prend environ 3 minutes. Veuillez répondre honnêtement aux questions pour obtenir des hypothèses précises.")}
-                </p>
-              </div>
-              <button 
-                id="btn-start-evaluation"
-                onClick={() => setStep('selection')}
-                className="flex items-center gap-2 bg-primary hover:bg-primary-700 text-white font-medium px-6 py-3 rounded-xl shadow-lg shadow-primary/25 transition-all duration-200 cursor-pointer"
-              >
-                <Play className="h-4 w-4 fill-white" />
-                {t('dashboard.pages.evaluation.start_button', "Lancer l'évaluation")}
-              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* State 1: Symptom Selection */}
-      {step === 'selection' && (
+      {evaluationState === EvaluationState.SELECTION && (
         <SymptomSelector 
           selectedSymptoms={selectedSymptoms}
           onToggleSymptom={toggleSymptom}
@@ -329,16 +339,16 @@ export default function EvaluationPage() {
       )}
 
       {/* State 2: Analysis loading state */}
-      {step === 'loading' && (
+      {evaluationState === EvaluationState.LOADING && (
         <AnalysisLoading />
       )}
 
       {/* State 3: Diagnostic prediction result */}
-      {step === 'result' && (
+      {evaluationState === EvaluationState.RESULT && (
         <EvaluationResult 
           resultData={resultData}
-          onBackToSelection={() => setStep('selection')}
-          onFindSpecialists={() => setStep('search_specialist')}
+          onBackToSelection={() => setEvaluationState(EvaluationState.SELECTION)}
+          onFindSpecialists={() => setEvaluationState(EvaluationState.SEARCH_SPECIALIST)}
           onNavigateToFollowups={() => {
             navigate('/dashboard/suivis');
           }}
@@ -346,11 +356,11 @@ export default function EvaluationPage() {
       )}
 
       {/* State 4: Recommended specialist and locator map */}
-      {step === 'search_specialist' && (
+      {evaluationState === EvaluationState.SEARCH_SPECIALIST && (
         <SpecialistFinder 
           specialist={resultData.specialist}
           doctors={resultData.doctors}
-          onBackToResults={() => setStep('result')}
+          onBackToResults={() => setEvaluationState(EvaluationState.RESULT)}
         />
       )}
 

@@ -45,7 +45,7 @@ export default function SymptomSelector({
   }, [searchQuery, allSymptoms, selectedSymptoms]);
 
   return (
-    <div className="space-y-6 max-w-4xl animate-fadeIn">
+    <div className="space-y-6 w-full animate-fadeIn">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-extrabold tracking-tight text-background-900 dark:text-white">
           {t('dashboard.pages.evaluation.selection_title', 'Évaluation des symptômes')}
@@ -55,7 +55,7 @@ export default function SymptomSelector({
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-4xl mx-auto">
         {/* Search Input Container */}
         <div ref={searchContainerRef} className="relative">
           <div className="flex items-center bg-white dark:bg-background-900 border border-background-200 dark:border-background-800 rounded-2xl px-4 py-4 shadow-sm hover:border-background-300 dark:hover:border-background-700 transition-colors">
