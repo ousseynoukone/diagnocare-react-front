@@ -392,12 +392,48 @@
       },
       "profil": {
         "title": "Profil médical",
-        "description": "Gérez vos informations personnelles et de santé pour améliorer la pertinence de l'analyse de l'IA.",
+        "description": "Ces informations permettent d'affiner la précision de nos prédictions.",
         "patient_badge": "Patient",
         "info_title": "Informations de base",
         "first_name": "Prénom",
         "last_name": "Nom",
-        "email": "Email"
+        "email": "Email",
+        "age": "Âge",
+        "sexe": "Sexe biologique",
+        "sexe_options": {
+          "homme": "Homme",
+          "femme": "Femme",
+          "autre": "Autre"
+        },
+        "poids": "Poids (kg)",
+        "taille": "Taille (cm)",
+        "section_basic": "Informations de base",
+        "section_habits": "Habitudes de vie",
+        "tabac": "Consommation de tabac",
+        "tabac_options": {
+          "oui": "Oui",
+          "non": "Non"
+        },
+        "alcool": "Consommation d'alcool",
+        "alcool_options": {
+          "reguliere": "Régulière",
+          "occasionnelle": "Occasionnelle",
+          "jamais": "Jamais"
+        },
+        "activite": "Activité physique (sédentarité)",
+        "activite_options": {
+          "sedentaire": "Sédentaire (peu ou pas de sport)",
+          "actif": "Actif (1-3 séances de sport/semaine)",
+          "tres_actif": "Très actif (plus de 3 séances/semaine)"
+        },
+        "security_banner": "Vos données sont stockées de manière sécurisée et ne sont utilisées que pour l'analyse de vos symptômes. Elles ne sont jamais partagées avec des tiers publicitaires.",
+        "save_btn": "Enregistrer",
+        "save_success": "Profil médical enregistré avec succès !",
+        "section_indicators": "Indicateurs de santé",
+        "tension": "Tension artérielle moyenne",
+        "cholesterol": "Cholestérol total (g/L)",
+        "antecedents": "Antécédents familiaux majeurs",
+        "antecedents_placeholder": "Diabète, hypertension, maladies cardiaques..."
       },
       "parametres": {
         "title": "Paramètres",
@@ -406,7 +442,9 @@
         "theme_label": "Mode d'affichage",
         "theme_desc": "Basculez entre le mode clair et le mode sombre.",
         "lang_label": "Langue",
-        "lang_desc": "Sélectionnez votre langue de préférence."
+        "lang_desc": "Sélectionnez votre langue de préférence.",
+        "theme_toggle_light": "Passer en mode clair",
+        "theme_toggle_dark": "Passer en mode sombre"
       }
     }
   }

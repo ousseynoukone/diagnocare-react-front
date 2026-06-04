@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Clock, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLocalFollowUps, completeLocalFollowUp } from '../../utils/storageHelper';
-import FollowUpItem from '../../components/dashboard/FollowUpItem';
+import FollowUpItem from '../../components/dashboard/followup/FollowUpItem';
 
 export default function SuivisPage() {
   const { t } = useTranslation();

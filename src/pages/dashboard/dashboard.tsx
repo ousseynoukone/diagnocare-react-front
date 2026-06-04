@@ -7,7 +7,7 @@ import { getLocalHistory, getLocalFollowUps } from '../../utils/storageHelper';
 import StatsCard from '../../components/dashboard/StatsCard';
 import AlertBanner from '../../components/dashboard/AlertBanner';
 import ActionCard from '../../components/dashboard/ActionCard';
-import EvaluationItem from '../../components/dashboard/EvaluationItem';
+import EvaluationItem from '../../components/dashboard/evaluation/EvaluationItem';
 
 export default function DashboardPage() {
   const { t } = useTranslation();

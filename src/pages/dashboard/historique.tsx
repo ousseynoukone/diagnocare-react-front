@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Search, AlertTriangle, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLocalHistory } from '../../utils/storageHelper';
-import HistoryItem from '../../components/dashboard/HistoryItem';
+import HistoryItem from '../../components/dashboard/history/HistoryItem';
 
 export default function HistoriquePage() {
   const { t } = useTranslation();

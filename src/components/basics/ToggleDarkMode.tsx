@@ -1,38 +1,69 @@
 import { useState } from 'react'
+import { Sun, Moon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ThemeStorageKey } from '../../types/storage-keys'
 
 export default function ToggleDarkMode() {
   const { t } = useTranslation()
-  // Read the initial theme class directly from the HTML element (set by index.html script)
   const [theme, setTheme] = useState<'dark' | 'light'>(() =>
     document.documentElement.classList.contains('dark') ? 'dark' : 'light'
   )
 
-  function toggleTheme() {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark'
-    setTheme(nextTheme)
+  const isDark = theme === 'dark'
 
-    if (nextTheme === 'dark') {
+  function toggleTheme() {
+    const next = isDark ? 'light' : 'dark'
+    setTheme(next)
+    if (next === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
-    window.localStorage.setItem(ThemeStorageKey, nextTheme)
+    window.localStorage.setItem(ThemeStorageKey, next)
   }
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      className="inline-flex items-center gap-2 rounded-full cursor-pointer border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+      aria-label={isDark ? t('dashboard.pages.parametres.theme_toggle_light', 'Passer en mode clair') : t('dashboard.pages.parametres.theme_toggle_dark', 'Passer en mode sombre')}
+      title={isDark ? t('dashboard.pages.parametres.theme_toggle_light', 'Passer en mode clair') : t('dashboard.pages.parametres.theme_toggle_dark', 'Passer en mode sombre')}
+      className={`
+        relative flex items-center w-20 h-10 rounded-full p-1 cursor-pointer
+        transition-all duration-300 ease-in-out focus:outline-none
+        border
+        ${isDark
+          ? 'bg-slate-900 border-slate-700'
+          : 'bg-slate-100 border-slate-300'
+        }
+      `}
     >
-      {theme === 'dark' ? (
-        <span aria-hidden="true">🌙</span>
-      ) : (
-        <span aria-hidden="true">☀️</span>
-      )}
-      <span>{theme === 'dark' ? t('theme.dark') : t('theme.light')}</span>
+      {/* Track icons */}
+      <span className="absolute left-2.5 flex items-center justify-center w-5 h-5">
+        <Sun className={`h-4 w-4 transition-opacity duration-200 ${isDark ? 'opacity-30 text-slate-400' : 'opacity-100 text-amber-500'}`} />
+      </span>
+      <span className="absolute right-2.5 flex items-center justify-center w-5 h-5">
+        <Moon className={`h-4 w-4 transition-opacity duration-200 ${isDark ? 'opacity-100 text-blue-300' : 'opacity-30 text-slate-400'}`} />
+      </span>
+
+      {/* Sliding knob */}
+      <span
+        className={`
+          relative z-10 flex items-center justify-center
+          h-8 w-8 rounded-full shadow-md
+          transition-all duration-300 ease-in-out
+          ${isDark
+            ? 'translate-x-10 bg-slate-700 text-blue-300'
+            : 'translate-x-0 bg-white text-amber-500'
+          }
+        `}
+      >
+        {isDark
+          ? <Moon className="h-4 w-4" />
+          : <Sun className="h-4 w-4" />
+        }
+      </span>
     </button>
   )
 }
+

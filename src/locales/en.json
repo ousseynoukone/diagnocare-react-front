@@ -392,12 +392,48 @@
       },
       "profil": {
         "title": "Medical Profile",
-        "description": "Manage your personal and health information to improve the relevance of the AI analysis.",
+        "description": "This information is used to refine the accuracy of our predictions.",
         "patient_badge": "Patient",
         "info_title": "Basic Information",
         "first_name": "First Name",
         "last_name": "Last Name",
-        "email": "Email"
+        "email": "Email",
+        "age": "Age",
+        "sexe": "Biological Sex",
+        "sexe_options": {
+          "homme": "Male",
+          "femme": "Female",
+          "autre": "Other"
+        },
+        "poids": "Weight (kg)",
+        "taille": "Height (cm)",
+        "section_basic": "Basic Information",
+        "section_habits": "Life Habits",
+        "tabac": "Tobacco consumption",
+        "tabac_options": {
+          "oui": "Yes",
+          "non": "No"
+        },
+        "alcool": "Alcohol consumption",
+        "alcool_options": {
+          "reguliere": "Regular",
+          "occasionnelle": "Occasional",
+          "jamais": "Never"
+        },
+        "activite": "Physical activity (sedentary)",
+        "activite_options": {
+          "sedentaire": "Sedentary (little or no exercise)",
+          "actif": "Active (1-3 exercise sessions/week)",
+          "tres_actif": "Very active (more than 3 sessions/week)"
+        },
+        "security_banner": "Your data is stored securely and is only used to analyze your symptoms. It is never shared with advertising third parties.",
+        "save_btn": "Save",
+        "save_success": "Medical profile saved successfully !",
+        "section_indicators": "Health Indicators",
+        "tension": "Average blood pressure",
+        "cholesterol": "Total cholesterol (g/L)",
+        "antecedents": "Major family medical history",
+        "antecedents_placeholder": "Diabetes, hypertension, heart diseases..."
       },
       "parametres": {
         "title": "Settings",
@@ -406,7 +442,9 @@
         "theme_label": "Display Mode",
         "theme_desc": "Switch between light and dark mode.",
         "lang_label": "Language",
-        "lang_desc": "Select your preferred language."
+        "lang_desc": "Select your preferred language.",
+        "theme_toggle_light": "Switch to light mode",
+        "theme_toggle_dark": "Switch to dark mode"
       }
     }
   }
