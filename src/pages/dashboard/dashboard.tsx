@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { FileText, AlertTriangle, Clock, Plus, Calendar } from 'lucide-react';
 import { useUserStore } from '../../store/UserStore';
-import DashboardHeader from '../../components/dashboard/DashboardHeader';
+import { getLocalHistory, getLocalFollowUps } from '../../utils/storageHelper';
 import StatsCard from '../../components/dashboard/StatsCard';
 import AlertBanner from '../../components/dashboard/AlertBanner';
 import ActionCard from '../../components/dashboard/ActionCard';
@@ -11,45 +12,30 @@ import EvaluationItem from '../../components/dashboard/EvaluationItem';
 export default function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  
   const user = useUserStore((state) => state.user);
+  const [records] = useState(() => getLocalHistory());
+  const [followups] = useState(() => getLocalFollowUps());
 
   const getFirstName = () => {
     return user?.firstName || 'Jean';
   };
 
-  // Mock list of recent evaluations
-  const recentEvaluations = [
-    {
-      id: 'eval-1',
-      title: t('dashboard.home.evaluations_list.migraine.title', 'Migraine probable'),
-      symptoms: t('dashboard.home.evaluations_list.migraine.symptoms', 'Maux de tête, fièvre légère'),
-      date: t('dashboard.home.evaluations_list.migraine.date', "Aujourd'hui, 09:41"),
-      confidence: 85,
-      urgent: false,
-    },
-    {
-      id: 'eval-2',
-      title: t('dashboard.home.evaluations_list.urgent.title', 'Consultation urgente requise'),
-      symptoms: t('dashboard.home.evaluations_list.urgent.symptoms', 'Douleur thoracique, essoufflement'),
-      date: t('dashboard.home.evaluations_list.urgent.date', 'Hier, 14:20'),
-      confidence: 92,
-      urgent: true,
-    },
-    {
-      id: 'eval-3',
-      title: t('dashboard.home.evaluations_list.viral.title', 'Infection virale bénigne'),
-      symptoms: t('dashboard.home.evaluations_list.viral.symptoms', 'Toux sèche, fatigue'),
-      date: t('dashboard.home.evaluations_list.viral.date', '12 Oct, 10:15'),
-      confidence: 78,
-      urgent: false,
-    },
-  ];
+  // Get active alerts count dynamically from history records
+  const activeAlertsCount = records.filter((r) => r.alert).length;
+
+  // Get next follow-up details dynamically
+  const nextPendingFollowUp = followups.find((f) => f.status === 'pending');
+  const nextFollowUpValue = nextPendingFollowUp ? '24h' : 'Aucun';
+  const nextFollowUpSubtext = nextPendingFollowUp 
+    ? nextPendingFollowUp.title 
+    : t('dashboard.pages.suivis.card_title', 'Aucun suivi actif');
+
+  // Display the 3 most recent evaluations from history
+  const recentEvaluations = records.slice(0, 3);
 
   return (
     <div className="h-full flex flex-col min-h-screen text-slate-800 dark:text-slate-100 max-w-7xl mx-auto space-y-8 pb-12">
-      {/* Top dashboard header (Language & Account) */}
-      <DashboardHeader />
-
       {/* Title & Subtitle + Last Update Badge */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
@@ -69,7 +55,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
           label={t('dashboard.home.stats.evaluations.label', 'Total évaluations')}
-          value={t('dashboard.home.stats.evaluations.value', '12')}
+          value={records.length}
           trend="+2"
           subtext={t('dashboard.home.stats.evaluations.subtext', 'ce mois-ci')}
           icon={FileText}
@@ -78,26 +64,26 @@ export default function DashboardPage() {
         />
         <StatsCard
           label={t('dashboard.home.stats.alerts.label', 'Alertes actives')}
-          value={t('dashboard.home.stats.alerts.value', '1')}
-          trend={t('dashboard.home.stats.alerts.subtext', 'Action requise')}
+          value={activeAlertsCount}
+          trend={activeAlertsCount > 0 ? t('dashboard.home.stats.alerts.subtext', 'Action requise') : ''}
           trendColor="text-red-500 dark:text-red-400"
-          subtext=""
+          subtext={activeAlertsCount === 0 ? t('dashboard.pages.suivis.completed_followup_status', 'Terminé') : ''}
           icon={AlertTriangle}
           iconBgClass="bg-red-50 dark:bg-red-950/40"
           iconColorClass="text-red-600 dark:text-red-400"
         />
         <StatsCard
           label={t('dashboard.home.stats.next_followup.label', 'Prochain suivi')}
-          value={t('dashboard.home.stats.next_followup.value', '24h')}
-          subtext={t('dashboard.home.stats.next_followup.subtext', 'Grippe saisonnière')}
+          value={nextFollowUpValue}
+          subtext={nextFollowUpSubtext}
           icon={Clock}
           iconBgClass="bg-amber-50 dark:bg-amber-950/40"
           iconColorClass="text-amber-500 dark:text-amber-400"
         />
       </div>
 
-      {/* Emergency Warning Banner */}
-      <AlertBanner />
+      {/* Emergency Warning Banner - Renders only if there are active warning/alert cases */}
+      {activeAlertsCount > 0 && <AlertBanner />}
 
       {/* Quick Action Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -141,10 +127,10 @@ export default function DashboardPage() {
             <EvaluationItem
               key={evalItem.id}
               title={evalItem.title}
-              symptoms={evalItem.symptoms}
+              symptoms={evalItem.symptoms || ''}
               date={evalItem.date}
               confidence={evalItem.confidence}
-              urgent={evalItem.urgent}
+              urgent={evalItem.alert}
               onClick={() => navigate(`/dashboard/historique`)}
             />
           ))}

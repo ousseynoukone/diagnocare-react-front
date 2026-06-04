@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Activity, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -6,9 +6,10 @@ import SymptomSelector from '../../components/dashboard/evaluation/SymptomSelect
 import AnalysisLoading from '../../components/dashboard/evaluation/AnalysisLoading';
 import EvaluationResult from '../../components/dashboard/evaluation/EvaluationResult';
 import SpecialistFinder from '../../components/dashboard/evaluation/SpecialistFinder';
-import type { Symptom, Doctor, PredictionResult } from '../../types/models/Evaluation';
-import { useEvaluationStore } from '../../store/EvaluationStore';
+import type { Symptom, PredictionResult } from '../../types/models/Evaluation';
 import { EvaluationState } from '../../types/models/enums/EvaluationStateEnum';
+import { useEvaluationStore } from '../../store/EvaluationStore';
+import { addLocalHistoryRecord, addLocalFollowUp } from '../../utils/storageHelper';
 
 // Symptom data definition matching database labels
 const ALL_SYMPTOMS: Symptom[] = [
@@ -248,15 +249,9 @@ export default function EvaluationPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  const evaluationState = useEvaluationStore((state) => state.evaluationState)
-  const setEvaluationState = useEvaluationStore((state) => state.setEvaluationState)
-
+  const evaluationState = useEvaluationStore((state) => state.evaluationState);
+  const setEvaluationState = useEvaluationStore((state) => state.setEvaluationState);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  
-  // Reset evaluation state to START on mount
-  useEffect(() => {
-    setEvaluationState(EvaluationState.START);
-  }, [setEvaluationState]);
   
   // Handle symptom toggling
   const toggleSymptom = (id: string) => {
@@ -283,6 +278,24 @@ export default function EvaluationPage() {
   }, [evaluationState]);
   // Compute prediction results based on selection
   const resultData = useMemo(() => getPredictionResult(selectedSymptoms), [selectedSymptoms]);
+
+  // Persist result record when state transitions to RESULT
+  useEffect(() => {
+    if (evaluationState === EvaluationState.RESULT && selectedSymptoms.length > 0) {
+      const symptomsStr = selectedSymptoms
+        .map(id => ALL_SYMPTOMS.find(s => s.id === id)?.label)
+        .filter(Boolean)
+        .join(', ');
+
+      addLocalHistoryRecord({
+        title: resultData.title,
+        specialist: resultData.specialist,
+        confidence: resultData.confidence,
+        alert: resultData.confidence > 90,
+        symptoms: symptomsStr || 'Symptômes mineurs',
+      });
+    }
+  }, [evaluationState, resultData, selectedSymptoms]);
 
   return (
     <div id="evaluation-page" className="space-y-6  max-w-6xl mx-auto pb-24 text-slate-800 dark:text-slate-100">
@@ -350,6 +363,7 @@ export default function EvaluationPage() {
           onBackToSelection={() => setEvaluationState(EvaluationState.SELECTION)}
           onFindSpecialists={() => setEvaluationState(EvaluationState.SEARCH_SPECIALIST)}
           onNavigateToFollowups={() => {
+            addLocalFollowUp(resultData.title, t('dashboard.pages.suivis.active_followup_status', 'À faire'));
             navigate('/dashboard/suivis');
           }}
         />

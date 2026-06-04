@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, Search, MapPin, Filter, Star, Calendar, Phone, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';

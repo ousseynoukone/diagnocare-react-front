@@ -1,8 +1,7 @@
-import React from 'react';
 import { ArrowLeft, Download, Calendar, CheckCircle, MapPin, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import type { Doctor, PredictionResult } from '../../../types/models/Evaluation';
+import type { PredictionResult } from '../../../types/models/Evaluation';
 
 interface EvaluationResultProps {
   resultData: PredictionResult;

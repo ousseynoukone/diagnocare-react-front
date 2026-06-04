@@ -15,6 +15,8 @@ import { useUserStore } from '../../store/UserStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import logoBlue from '../../assets/logo-blue.svg';
+import ToggleDarkMode from '../basics/ToggleDarkMode';
+import SwitchLanguage from '../basics/SwitchLanguage';
 
 export default function SideBar() {
   const { t } = useTranslation();
@@ -102,6 +104,12 @@ export default function SideBar() {
 
       {/* Bottom Part: Profile & Logout */}
       <div className="space-y-6 pt-6 border-t border-slate-800/60">
+        {/* Language & Theme Toggles */}
+        <div className="flex items-center justify-between gap-2 px-2 flex-wrap sm:flex-nowrap">
+          <ToggleDarkMode />
+          <SwitchLanguage />
+        </div>
+
         {/* Profile Card */}
         <div className="flex items-center gap-3 px-2">
           <div className="h-10 w-10 rounded-full bg-primary-700 border border-primary/30 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-primary-900/40 flex-shrink-0">
