@@ -261,7 +261,7 @@
         "evaluations": {
           "label": "Total évaluations",
           "value": "12",
-          "subtext": "+2 ce mois-ci"
+          "subtext": "ce mois-ci"
         },
         "alerts": {
           "label": "Alertes actives",
@@ -293,7 +293,8 @@
         "title": "Évaluations récentes",
         "view_all": "Voir tout l'historique",
         "confidence": "Confiance",
-        "attention_required": "Attention requise"
+        "attention_required": "Attention requise",
+        "empty": "Aucune évaluation récente"
       }
     },
     "pages": {

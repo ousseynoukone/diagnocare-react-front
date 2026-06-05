@@ -261,7 +261,7 @@
         "evaluations": {
           "label": "Total evaluations",
           "value": "12",
-          "subtext": "+2 this month"
+          "subtext": "this month"
         },
         "alerts": {
           "label": "Active alerts",
@@ -293,7 +293,8 @@
         "title": "Recent evaluations",
         "view_all": "View all history",
         "confidence": "Confidence",
-        "attention_required": "Attention required"
+        "attention_required": "Attention required",
+        "empty": "No recent evaluations"
       }
     },
     "pages": {

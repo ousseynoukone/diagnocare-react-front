@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, AlertTriangle, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
-import { getLocalHistory } from '../../utils/storageHelper';
+import { useUserStore } from '../../store/UserStore';
+import { useDetailedPredictions } from '../../hooks/usePredictions';
 import HistoryItem from '../../components/dashboard/history/HistoryItem';
 
 export default function HistoriquePage() {
@@ -12,7 +13,16 @@ export default function HistoriquePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  const [records] = useState(() => getLocalHistory());
+  const user = useUserStore((state) => state.user);
+  const { data: records = [], isLoading } = useDetailedPredictions(user?.id);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center min-h-[400px] max-w-7xl mx-auto">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-primary dark:border-slate-800 dark:border-t-primary"></div>
+      </div>
+    );
+  }
 
   // Filtering records dynamically
   const filteredRecords = useMemo(() => {

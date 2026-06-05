@@ -1,6 +1,7 @@
 import { Role } from "./Auth";
 
 export interface UserProfileDTO {
+    id: number;
     email: string;
     firstName: string;
     lastName: string;
@@ -16,6 +17,7 @@ export function toUserProfileDTO(apiUser: any): UserProfileDTO {
     }
 
     return {
+        id: apiUser.id,
         email: apiUser.email,
         firstName: apiUser.firstName,
         lastName: apiUser.lastName,

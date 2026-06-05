@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { FileText, AlertTriangle, Clock, Plus, Calendar } from 'lucide-react';
 import { useUserStore } from '../../store/UserStore';
-import { getLocalHistory, getLocalFollowUps } from '../../utils/storageHelper';
+import { useDetailedPredictions } from '../../hooks/usePredictions';
+import { useDetailedCheckIns } from '../../hooks/useCheckIns';
 import StatsCard from '../../components/dashboard/StatsCard';
 import AlertBanner from '../../components/dashboard/AlertBanner';
 import ActionCard from '../../components/dashboard/ActionCard';
@@ -14,12 +14,26 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   
   const user = useUserStore((state) => state.user);
-  const [records] = useState(() => getLocalHistory());
-  const [followups] = useState(() => getLocalFollowUps());
+  
+  // Connect to API using TanStack Query hooks
+  const { data: records = [], isLoading: isHistoryLoading } = useDetailedPredictions(user?.id);
+  const { data: followups = [], isLoading: isFollowUpsLoading } = useDetailedCheckIns(user?.id);
 
   const getFirstName = () => {
     return user?.firstName || 'Jean';
   };
+
+  // Show a premium loading spinner while fetching data from the API
+  if (isHistoryLoading || isFollowUpsLoading) {
+    return (
+      <div className="h-full flex items-center justify-center min-h-[400px] max-w-7xl mx-auto">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-primary dark:border-slate-800 dark:border-t-primary"></div>
+      </div>
+    );
+  }
+
+  // Calculate evaluations created during the current month dynamically
+  const monthlyCount = records.filter((r) => r.monthFilter).length;
 
   // Get active alerts count dynamically from history records
   const activeAlertsCount = records.filter((r) => r.alert).length;
@@ -56,8 +70,8 @@ export default function DashboardPage() {
         <StatsCard
           label={t('dashboard.home.stats.evaluations.label', 'Total évaluations')}
           value={records.length}
-          trend="+2"
-          subtext={t('dashboard.home.stats.evaluations.subtext', 'ce mois-ci')}
+          trend={monthlyCount > 0 ? `+${monthlyCount}` : ''}
+          subtext={monthlyCount > 0 ? t('dashboard.home.stats.evaluations.subtext', 'ce mois-ci') : `0 ${t('dashboard.home.stats.evaluations.subtext', 'ce mois-ci')}`}
           icon={FileText}
           iconBgClass="bg-blue-50 dark:bg-blue-950/40"
           iconColorClass="text-blue-600 dark:text-blue-400"
@@ -123,17 +137,25 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {recentEvaluations.map((evalItem) => (
-            <EvaluationItem
-              key={evalItem.id}
-              title={evalItem.title}
-              symptoms={evalItem.symptoms || ''}
-              date={evalItem.date}
-              confidence={evalItem.confidence}
-              urgent={evalItem.alert}
-              onClick={() => navigate(`/dashboard/historique`)}
-            />
-          ))}
+          {recentEvaluations.length > 0 ? (
+            recentEvaluations.map((evalItem) => (
+              <EvaluationItem
+                key={evalItem.id}
+                title={evalItem.title}
+                symptoms={evalItem.symptoms || ''}
+                date={evalItem.date}
+                confidence={evalItem.confidence}
+                urgent={evalItem.alert}
+                onClick={() => navigate(`/dashboard/historique`)}
+              />
+            ))
+          ) : (
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm text-center py-8">
+              <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">
+                {t('dashboard.home.recent_evaluations.empty', 'Aucune évaluation récente')}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
