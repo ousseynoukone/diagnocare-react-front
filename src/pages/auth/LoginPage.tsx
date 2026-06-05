@@ -22,7 +22,6 @@ export default function LoginPage() {
     const setUser = useUserStore((state) => state.setUser);
 
     const onSubmit = (data: any) => {
-        setGeneralError(null);
         const email = data.email as string;
         const password = data.password as string;
 

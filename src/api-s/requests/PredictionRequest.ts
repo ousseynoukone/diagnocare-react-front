@@ -1,38 +1,7 @@
+import type { CreatePredictionRequest, HydratedPrediction, PredictionDTO, PredictionWithResultsResponse } from '../../types/models/Prediction';
 import { apiClient } from '../AxiosApiClient';
 
-export interface CreatePredictionRequest {
-  userId: number;
-  symptomLabels: string[];
-}
 
-export interface PredictionDTO {
-  id: number;
-  bestScore: number;
-  pdfReportUrl: string | null;
-  isRedAlert: boolean;
-  comment: string | null;
-  sessionSymptomId: number;
-  previousPredictionId: number | null;
-  createdAt: string;
-}
-
-export interface PredictionWithResultsResponse {
-  prediction: PredictionDTO;
-  mlResults: any;
-}
-
-export interface HydratedPrediction {
-  id: string; // String ID to match local mock expectations
-  title: string;
-  specialist: string;
-  date: string;
-  confidence: number;
-  alert: boolean;
-  monthFilter: boolean;
-  symptoms: string;
-  sessionSymptomId: number;
-  rawPrediction: PredictionDTO;
-}
 
 // Fetch all predictions for a specific user
 export function getPredictionsByUserId(userId: number): Promise<PredictionDTO[]> {
@@ -50,7 +19,8 @@ function formatDate(dateStr: string): string {
     const dateObj = new Date(dateStr);
     if (isNaN(dateObj.getTime())) return dateStr;
     const months = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec'];
-    return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}, ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
   } catch (e) {
     return dateStr;
   }
@@ -99,10 +69,39 @@ export async function getDetailedPredictionsByUser(userId: number): Promise<Hydr
         }
         scorePct = Math.round(scorePct);
 
+        const alternativesList = Array.isArray(pathologyResults) && pathologyResults.length > 1
+          ? pathologyResults.slice(1).map((alt: any) => {
+              let score = alt.diseaseScore;
+              if (score <= 1.0) {
+                score = score * 100;
+              }
+              return {
+                name: alt.localizedDiseaseName || alt.pathologyName,
+                score: Math.round(score)
+              };
+            })
+          : [];
+
+        const allPossibilitiesList = Array.isArray(pathologyResults)
+          ? pathologyResults.map((alt: any, index: number) => {
+              let score = alt.diseaseScore;
+              if (score <= 1.0) {
+                score = score * 100;
+              }
+              return {
+                title: alt.localizedDiseaseName || alt.pathologyName,
+                description: alt.description || '',
+                confidence: Math.round(score),
+                specialist: alt.localizedSpecialistLabel || alt.doctorSpecialistLabel || 'Généraliste',
+                isPrimary: index === 0
+              };
+            })
+          : [];
+
         return {
           id: String(pred.id),
-          title: bestPathology ? bestPathology.pathologyName : (pred.comment || 'Analyse de symptômes'),
-          specialist: bestPathology ? bestPathology.doctorSpecialistLabel : 'Généraliste',
+          title: bestPathology ? (bestPathology.localizedDiseaseName || bestPathology.pathologyName) : (pred.comment || 'Analyse de symptômes'),
+          specialist: bestPathology ? (bestPathology.localizedSpecialistLabel || bestPathology.doctorSpecialistLabel) : 'Généraliste',
           date: formatDate(pred.createdAt),
           confidence: scorePct,
           alert: pred.isRedAlert,
@@ -110,6 +109,9 @@ export async function getDetailedPredictionsByUser(userId: number): Promise<Hydr
           symptoms: symptomsList,
           sessionSymptomId: pred.sessionSymptomId,
           rawPrediction: pred,
+          description: bestPathology ? bestPathology.description : '',
+          alternatives: alternativesList,
+          allPossibilities: allPossibilitiesList
         };
       } catch (err) {
         console.error(`Failed to hydrate prediction ${pred.id}:`, err);
@@ -131,6 +133,9 @@ export async function getDetailedPredictionsByUser(userId: number): Promise<Hydr
           symptoms: '',
           sessionSymptomId: pred.sessionSymptomId,
           rawPrediction: pred,
+          description: '',
+          alternatives: [],
+          allPossibilities: []
         };
       }
     })
@@ -149,3 +154,24 @@ export function createPredictionRequest(request: CreatePredictionRequest): Promi
       throw error;
     });
 }
+
+// Delete a single prediction
+export function deletePrediction(id: number): Promise<void> {
+  return apiClient.delete(`/predictions/${id}`)
+    .then((response) => response.data.data ?? response.data)
+    .catch((error) => {
+      console.error(`Deleting prediction ${id} failed:`, error);
+      throw error;
+    });
+}
+
+// Delete all predictions of a user
+export function deleteAllPredictions(userId: number): Promise<void> {
+  return apiClient.delete(`/predictions/user/${userId}`)
+    .then((response) => response.data.data ?? response.data)
+    .catch((error) => {
+      console.error(`Deleting all predictions for user ${userId} failed:`, error);
+      throw error;
+    });
+}
+

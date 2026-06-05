@@ -14,6 +14,11 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     config.headers['Content-Type'] = 'application/json';
+    if (config.url && !config.url.startsWith('/auth')) {
+      if (!config.url.startsWith('/diagnocare')) {
+        config.url = `/diagnocare${config.url}`;
+      }
+    }
     return config;
   },
   (error) => {

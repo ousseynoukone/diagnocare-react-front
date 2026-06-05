@@ -1,4 +1,4 @@
-import { Calendar, AlertTriangle } from 'lucide-react';
+import { Calendar, AlertTriangle, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface HistoryItemProps {
@@ -8,6 +8,7 @@ interface HistoryItemProps {
   confidence: number;
   alert?: boolean;
   onViewDetails: () => void;
+  onDelete: () => void;
 }
 
 export default function HistoryItem({
@@ -17,6 +18,7 @@ export default function HistoryItem({
   confidence,
   alert = false,
   onViewDetails,
+  onDelete,
 }: HistoryItemProps) {
   const { t } = useTranslation();
 
@@ -65,9 +67,9 @@ export default function HistoryItem({
       </div>
 
       {/* Stats and Action Details */}
-      <div className="flex items-center justify-between sm:justify-end gap-8 shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-slate-800">
         {/* Date */}
-        <div className="sm:text-right">
+        <div className="sm:text-right mr-4">
           <span className="block text-xs font-medium text-slate-400 dark:text-slate-500">
             {t('dashboard.pages.historique.date_label', 'Date')}
           </span>
@@ -77,7 +79,7 @@ export default function HistoryItem({
         </div>
 
         {/* Confidence */}
-        <div className="sm:text-right">
+        <div className="sm:text-right mr-4">
           <span className="block text-xs font-medium text-slate-400 dark:text-slate-500">
             {t('dashboard.home.recent_evaluations.confidence', 'Confiance')}
           </span>
@@ -86,16 +88,31 @@ export default function HistoryItem({
           </span>
         </div>
 
-        {/* Details Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewDetails();
-          }}
-          className="bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-xs shrink-0 cursor-pointer"
-        >
-          {t('dashboard.pages.historique.details_button', 'Détails')}
-        </button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Details Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails();
+            }}
+            className="bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-xs shrink-0 cursor-pointer"
+          >
+            {t('dashboard.pages.historique.details_button', 'Détails')}
+          </button>
+
+          {/* Delete Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/50 p-2.5 rounded-xl transition-all duration-200 shadow-xs shrink-0 cursor-pointer"
+            title={t('common.delete', 'Supprimer')}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

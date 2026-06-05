@@ -169,8 +169,8 @@ export default function SymptomSelector({
               </>
             ) : (
               <>
-                <CheckCircle className="h-5 w-5 text-primary shrink-0" />
-                <span className="text-sm text-primary font-bold">
+                <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
+                <span className="text-sm text-emerald-600 dark:text-emerald-400 font-bold">
                   {selectedSymptoms.length === 1 
                     ? t('dashboard.pages.evaluation.symptoms_selected_one', '1 symptôme sélectionné') 
                     : t('dashboard.pages.evaluation.symptoms_selected_plural', { count: selectedSymptoms.length, defaultValue: '{{count}} symptômes sélectionnés' })}

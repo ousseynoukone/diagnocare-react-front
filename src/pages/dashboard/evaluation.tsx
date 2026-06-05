@@ -1,258 +1,202 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Activity, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import SymptomSelector from '../../components/dashboard/evaluation/SymptomSelector';
 import AnalysisLoading from '../../components/dashboard/evaluation/AnalysisLoading';
 import EvaluationResult from '../../components/dashboard/evaluation/EvaluationResult';
 import SpecialistFinder from '../../components/dashboard/evaluation/SpecialistFinder';
-import type { Symptom, PredictionResult } from '../../types/models/Evaluation';
+import type { Symptom, PredictionResult, Doctor } from '../../types/models/Evaluation';
 import { EvaluationState } from '../../types/models/enums/EvaluationStateEnum';
 import { useEvaluationStore } from '../../store/EvaluationStore';
-import { addLocalHistoryRecord, addLocalFollowUp } from '../../utils/storageHelper';
+import { useCreatePrediction } from '../../hooks/usePredictions';
+import { useUserStore } from '../../store/UserStore';
+import { useMLSymptomsMetadata } from '../../hooks/useSymptoms';
+import type { PredictionWithResultsResponse } from '../../types/models/Prediction';
 
-// Symptom data definition matching database labels
-const ALL_SYMPTOMS: Symptom[] = [
-  { id: 'fever', label: 'Fièvre', en: 'Fever' },
-  { id: 'headache', label: 'Maux de tête', en: 'Headache' },
-  { id: 'cough', label: 'Toux', en: 'Cough' },
-  { id: 'fatigue', label: 'Fatigue', en: 'Fatigue' },
-  { id: 'nausea', label: 'Nausées', en: 'Nausea' },
-  { id: 'chest_pain', label: 'Douleur thoracique', en: 'Chest pain' },
-  { id: 'dizziness', label: 'Vertiges', en: 'Vertigo / Dizziness' },
-  { id: 'throat_irritation', label: 'Mal de gorge', en: 'Sore throat' },
-  { id: 'breathlessness', label: 'Essoufflement', en: 'Shortness of breath' },
-  { id: 'itching', label: 'Démangeaisons', en: 'Itching' },
-  { id: 'vomiting', label: 'Vomissements', en: 'Vomiting' },
-  { id: 'loss_of_appetite', label: "Perte d'appétit", en: 'Loss of appetite' },
-  { id: 'abdominal_pain', label: 'Douleur abdominale', en: 'Abdominal pain' },
-  { id: 'muscle_pain', label: 'Courbatures / Douleurs musculaires', en: 'Muscle pain' },
-  { id: 'continuous_sneezing', label: 'Éternuements continus', en: 'Continuous sneezing' },
-  { id: 'runny_nose', label: 'Nez qui coule', en: 'Runny nose' },
-  { id: 'sweating', label: 'Transpiration', en: 'Sweating' },
-  { id: 'chills', label: 'Frissons', en: 'Chills' },
-];
 
-const FREQUENT_SYMPTOM_IDS = [
-  'fever',
-  'headache',
-  'cough',
-  'fatigue',
-  'nausea',
-  'chest_pain',
-  'dizziness',
-  'throat_irritation',
-  'breathlessness',
-];
-
-// Generate dynamic predictions based on selected symptoms
-const getPredictionResult = (selectedIds: string[]): PredictionResult => {
-  const selected = new Set(selectedIds);
-  
-  // Case 1: Migraine
-  if (selected.has('headache') && (selected.has('dizziness') || selected.has('nausea') || selected.has('throat_irritation') || selected.has('breathlessness') || selected.has('fatigue'))) {
-    return {
-      title: 'Migraine avec aura',
-      description: 'Maux de tête intenses souvent accompagnés de troubles visuels ou sensoriels temporaires, de nausées ou de vertiges.',
-      confidence: 88,
-      specialist: 'Neurologue',
-      alternatives: [
-        { name: 'Céphalée de tension', score: 45 },
-        { name: 'Sinusite aiguë', score: 12 }
-      ],
-      doctors: [
-        {
-          name: 'Dr. Sophie Martin',
-          specialist: 'Neurologue',
-          sector: 'Secteur 1',
-          rating: 4.9,
-          reviews: 124,
-          address: '15 Rue de la République, 75001 Paris',
-          nextSlot: "Aujourd'hui à 16:30",
-          coords: { x: 120, y: 150 },
-          phone: '01 42 27 88 12'
-        },
-        {
-          name: 'Dr. Thomas Dubois',
-          specialist: 'Neurologue',
-          sector: 'Secteur 1',
-          rating: 4.7,
-          reviews: 89,
-          address: '42 Boulevard Saint-Germain, 75005 Paris',
-          nextSlot: 'Demain à 09:00',
-          coords: { x: 260, y: 220 },
-          phone: '01 45 82 19 33'
-        },
-        {
-          name: 'Dr. Marc Lepitre',
-          specialist: 'Neurologue',
-          sector: 'Secteur 2',
-          rating: 4.8,
-          reviews: 42,
-          address: '8 Avenue Foch, 75116 Paris',
-          nextSlot: 'Ven 5 Juin à 14:00',
-          coords: { x: 60, y: 180 },
-          phone: '01 40 56 12 99'
-        },
-        {
-          name: 'Dr. Catherine Vasseur',
-          specialist: 'Neurologue',
-          sector: 'Secteur 1',
-          rating: 4.6,
-          reviews: 73,
-          address: '112 Boulevard de Sébastopol, 75003 Paris',
-          nextSlot: 'Lun 8 Juin à 10:15',
-          coords: { x: 220, y: 90 },
-          phone: '01 48 04 77 15'
-        }
-      ]
-    };
-  }
-  
-  // Case 2: Cardiac warning
-  if (selected.has('chest_pain') || (selected.has('breathlessness') && selected.has('sweating'))) {
-    return {
-      title: 'Angine de poitrine / Suspicion Cardiaque',
-      description: 'Douleur ou inconfort thoracique causé par un manque d’irrigation sanguine du muscle cardiaque. Nécessite un avis médical rapide.',
-      confidence: 78,
-      specialist: 'Cardiologue',
-      urgent: true,
-      alternatives: [
-        { name: 'Reflux gastro-œsophagien (RGO)', score: 38 },
-        { name: 'Crise d’angoisse / Spasmophilie', score: 25 }
-      ],
-      doctors: [
-        {
-          name: 'Dr. Antoine Lemaire',
-          specialist: 'Cardiologue',
-          sector: 'Secteur 1',
-          rating: 4.9,
-          reviews: 215,
-          address: '88 Rue de Rivoli, 75004 Paris',
-          nextSlot: "Aujourd'hui à 17:15",
-          coords: { x: 190, y: 140 },
-          phone: '01 42 77 22 44'
-        },
-        {
-          name: 'Dr. Sarah Bendayan',
-          specialist: 'Cardiologue',
-          sector: 'Secteur 2',
-          rating: 4.8,
-          reviews: 134,
-          address: '14 Avenue de Suffren, 75015 Paris',
-          nextSlot: 'Demain à 11:30',
-          coords: { x: 70, y: 240 },
-          phone: '01 45 78 90 12'
-        },
-        {
-          name: 'Dr. Philippe Rousseau',
-          specialist: 'Cardiologue',
-          sector: 'Secteur 1',
-          rating: 4.6,
-          reviews: 98,
-          address: '27 Rue du Faubourg Saint-Honoré, 75008 Paris',
-          nextSlot: 'Lun 8 Juin à 09:00',
-          coords: { x: 100, y: 80 },
-          phone: '01 44 56 30 00'
-        }
-      ]
-    };
-  }
-
-  // Case 3: Viral infection
-  if (selected.has('fever') || selected.has('cough') || selected.has('throat_irritation') || selected.has('runny_nose')) {
-    return {
-      title: 'Infection respiratoire aiguë (type Rhume/Grippe)',
-      description: 'Infection virale des voies respiratoires supérieures accompagnée de toux, congestion, irritation et fatigue générale.',
-      confidence: 92,
-      specialist: 'Pneumologue',
-      alternatives: [
-        { name: 'Rhume commun / Rhinopharyngite', score: 68 },
-        { name: 'Bronchite aiguë', score: 35 }
-      ],
-      doctors: [
-        {
-          name: 'Dr. Claire Dupuis',
-          specialist: 'Pneumologue',
-          sector: 'Secteur 1',
-          rating: 4.8,
-          reviews: 95,
-          address: '62 Boulevard de Port-Royal, 75005 Paris',
-          nextSlot: "Aujourd'hui à 15:45",
-          coords: { x: 230, y: 280 },
-          phone: '01 40 27 15 30'
-        },
-        {
-          name: 'Dr. Jean-Pierre Roche',
-          specialist: 'Pneumologue',
-          sector: 'Secteur 1',
-          rating: 4.7,
-          reviews: 110,
-          address: '18 Rue de Charenton, 75012 Paris',
-          nextSlot: 'Demain à 10:00',
-          coords: { x: 310, y: 190 },
-          phone: '01 43 44 20 20'
-        },
-        {
-          name: 'Dr. Emilie Roux',
-          specialist: 'Pneumologue',
-          sector: 'Secteur 2',
-          rating: 4.9,
-          reviews: 58,
-          address: '5 Avenue Carnot, 75017 Paris',
-          nextSlot: 'Jeu 4 Juin à 11:30',
-          coords: { x: 50, y: 70 },
-          phone: '01 42 67 11 00'
-        }
-      ]
-    };
-  }
-
-  // Case 4: Default generic response
-  return {
-    title: 'Rhume commun / Affection bénigne',
-    description: 'Infection virale bénigne des voies nasales et de la gorge. Se résout généralement spontanément avec du repos et une bonne hydratation.',
-    confidence: 85,
-    specialist: 'Médecin Généraliste',
-    alternatives: [
-      { name: 'Allergie saisonnière', score: 40 },
-      { name: 'Fatigue passagère', score: 18 }
-    ],
-    doctors: [
-      {
-        name: 'Dr. Sophie Martin',
-        specialist: 'Médecin Généraliste',
-        sector: 'Secteur 1',
-        rating: 4.9,
-        reviews: 320,
-        address: '15 Rue de la République, 75001 Paris',
-        nextSlot: "Aujourd'hui à 16:30",
-        coords: { x: 120, y: 150 },
-        phone: '01 42 27 88 12'
-      },
-      {
-        name: 'Dr. Thomas Dubois',
-        specialist: 'Médecin Généraliste',
-        sector: 'Secteur 1',
-        rating: 4.7,
-        reviews: 245,
-        address: '42 Boulevard Saint-Germain, 75005 Paris',
-        nextSlot: 'Demain à 09:00',
-        coords: { x: 260, y: 220 },
-        phone: '01 45 82 19 33'
-      }
-    ]
-  };
+const getDoctorsForSpecialist = (specialist: string, lang: string): Doctor[] => {
+  const isEn = lang.startsWith('en');
+  return [
+    {
+      name: 'Dr. Sophie Martin',
+      specialist: specialist,
+      sector: isEn ? 'Tier 1' : 'Secteur 1',
+      rating: 4.9,
+      reviews: 124,
+      address: isEn ? '15 Republic Street, 75001 Paris' : '15 Rue de la République, 75001 Paris',
+      nextSlot: isEn ? "Today at 16:30" : "Aujourd'hui à 16:30",
+      coords: { x: 120, y: 150 },
+      phone: '01 42 27 88 12'
+    },
+    {
+      name: 'Dr. Thomas Dubois',
+      specialist: specialist,
+      sector: isEn ? 'Tier 1' : 'Secteur 1',
+      rating: 4.7,
+      reviews: 89,
+      address: isEn ? '42 Saint-Germain Boulevard, 75005 Paris' : '42 Boulevard Saint-Germain, 75005 Paris',
+      nextSlot: isEn ? 'Tomorrow at 09:00' : 'Demain à 09:00',
+      coords: { x: 260, y: 220 },
+      phone: '01 45 82 19 33'
+    },
+    {
+      name: 'Dr. Marc Lepitre',
+      specialist: specialist,
+      sector: isEn ? 'Tier 2' : 'Secteur 2',
+      rating: 4.8,
+      reviews: 42,
+      address: isEn ? '8 Foch Avenue, 75116 Paris' : '8 Avenue Foch, 75116 Paris',
+      nextSlot: isEn ? 'Fri Jun 5 at 14:00' : 'Ven 5 Juin à 14:00',
+      coords: { x: 70, y: 240 },
+      phone: '01 40 56 12 99'
+    }
+  ];
 };
 
+function mapBackendResponse(response: PredictionWithResultsResponse, lang: string): PredictionResult {
+  const isFr = lang.startsWith('fr');
+  const predictions = response.mlResults?.predictions || [];
+  
+  if (predictions.length === 0) {
+    const defaultSpecialist = isFr ? 'Médecin Généraliste' : 'General Practitioner';
+    return {
+      title: isFr ? 'Rhume commun / Affection bénigne' : 'Common Cold',
+      description: isFr 
+        ? 'Infection virale bénigne des voies nasales et de la gorge. Se résout généralement spontanément.'
+        : 'Mild viral infection of nose and throat. Usually resolves on its own.',
+      confidence: 80,
+      specialist: defaultSpecialist,
+      urgent: response.prediction?.isRedAlert || false,
+      alternatives: [],
+      doctors: getDoctorsForSpecialist(defaultSpecialist, lang)
+    };
+  }
+
+  const primary = predictions[0];
+  const title = isFr ? (primary.disease_fr || primary.disease) : (primary.disease_en || primary.disease);
+  const specialist = isFr ? (primary.specialist_fr || primary.specialist) : (primary.specialist_en || primary.specialist);
+  const description = primary.description || '';
+  
+  let confidence = primary.probability ?? 80;
+  if (confidence <= 1.0) {
+    confidence = confidence * 100;
+  }
+  confidence = Math.round(confidence);
+
+  let specialistConfidence = primary.specialist_probability ?? 0;
+  if (specialistConfidence > 0 && specialistConfidence <= 1.0) {
+    specialistConfidence = specialistConfidence * 100;
+  }
+  specialistConfidence = Math.round(specialistConfidence);
+
+  const alternatives = predictions.slice(1).map((alt: any) => {
+    let score = alt.probability ?? 50;
+    if (score <= 1.0) {
+      score = score * 100;
+    }
+    score = Math.round(score);
+    return {
+      name: isFr ? (alt.disease_fr || alt.disease) : (alt.disease_en || alt.disease),
+      score
+    };
+  }).sort((a: any, b: any) => b.score - a.score);
+
+  const allPossibilities = predictions.map((pred: any, index: number) => {
+    const pTitle = isFr ? (pred.disease_fr || pred.disease) : (pred.disease_en || pred.disease);
+    const pSpecialist = isFr ? (pred.specialist_fr || pred.specialist) : (pred.specialist_en || pred.specialist);
+    const pDescription = pred.description || '';
+    
+    let pConfidence = pred.probability ?? 80;
+    if (pConfidence <= 1.0) {
+      pConfidence = pConfidence * 100;
+    }
+    pConfidence = Math.round(pConfidence);
+
+    let pSpecialistConfidence = pred.specialist_probability ?? 0;
+    if (pSpecialistConfidence > 0 && pSpecialistConfidence <= 1.0) {
+      pSpecialistConfidence = pSpecialistConfidence * 100;
+    }
+    pSpecialistConfidence = Math.round(pSpecialistConfidence);
+
+    return {
+      title: pTitle,
+      description: pDescription,
+      confidence: pConfidence,
+      specialist: pSpecialist,
+      specialistConfidence: pSpecialistConfidence,
+      isPrimary: index === 0
+    };
+  });
+
+  const rawProfile = response.mlResults?.metadata?.profile_used;
+  const profileUsed: Record<string, string> = {};
+  if (rawProfile) {
+    Object.entries(rawProfile).forEach(([key, val]) => {
+      profileUsed[key] = String(val);
+    });
+  }
+
+  return {
+    id: response.prediction?.id,
+    title,
+    description,
+    confidence,
+    specialist,
+    specialistConfidence,
+    urgent: response.prediction?.isRedAlert || false,
+    alternatives,
+    doctors: getDoctorsForSpecialist(specialist, lang),
+    profileUsed,
+    allPossibilities
+  };
+}
+
 export default function EvaluationPage() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   
   const evaluationState = useEvaluationStore((state) => state.evaluationState);
   const setEvaluationState = useEvaluationStore((state) => state.setEvaluationState);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  
+  const [resultData, setResultData] = useState<PredictionResult | null>(null);
+  const [selectedSpecialist, setSelectedSpecialist] = useState<string>('');
+
+  const user = useUserStore((state) => state.user);
+  const { mutateAsync: createPrediction } = useCreatePrediction();
+  const { data: mlMetadata, isLoading: isLoadingSymptoms } = useMLSymptomsMetadata();
+
+  // Map ML symptoms list dynamically based on active language translations
+  const allSymptoms: Symptom[] = useMemo(() => {
+    if (!mlMetadata?.symptoms?.en) return [];
+    
+    return mlMetadata.symptoms.en.map((enItem) => {
+      const frItem = mlMetadata.symptoms.fr?.find(fr => fr.id === enItem.id);
+      const isFr = i18n.language.startsWith('fr');
+      
+      return {
+        id: enItem.id,
+        label: isFr ? (frItem?.label || enItem.label) : enItem.label,
+        en: enItem.label,
+      };
+    });
+  }, [mlMetadata, i18n.language]);
+
+  // Compute frequent symptoms that exist in the loaded metadata
+  const frequentSymptomIds = useMemo(() => {
+    const DEFAULT_FREQUENT_IDS = [
+      'fever',
+      'headache',
+      'cough',
+      'fatigue',
+      'nausea',
+      'chest_pain',
+      'dizziness',
+      'throat_irritation',
+      'breathlessness',
+    ];
+    return DEFAULT_FREQUENT_IDS.filter(id => allSymptoms.some(s => s.id === id));
+  }, [allSymptoms]);
+
   // Handle symptom toggling
   const toggleSymptom = (id: string) => {
     setSelectedSymptoms(prev => 
@@ -260,42 +204,49 @@ export default function EvaluationPage() {
     );
   };
 
-  // Trigger analysis state transition
-  const handleStartAnalysis = () => {
-    if (selectedSymptoms.length === 0) return;
+  // Trigger analysis state transition and API call
+  const handleStartAnalysis = async () => {
+    if (selectedSymptoms.length === 0 || !user?.id) return;
     setEvaluationState(EvaluationState.LOADING);
+    try {
+      const response = await createPrediction({
+        userId: user.id,
+        symptomLabels: selectedSymptoms,
+      });
+      const mapped = mapBackendResponse(response, i18n.language);
+      
+      const translatedSymptoms = selectedSymptoms.map(id => {
+        const found = allSymptoms.find(s => s.id === id);
+        return found ? found.label : id;
+      });
+      mapped.symptoms = translatedSymptoms;
+
+      setResultData(mapped);
+      setEvaluationState(EvaluationState.RESULT);
+    } catch (error) {
+      console.error('Failed to create prediction:', error);
+      const errorMsg = t('dashboard.pages.evaluation.error_message', 'Une erreur est survenue lors de l’analyse. Veuillez réessayer.');
+      toast.error(errorMsg);
+      setEvaluationState(EvaluationState.SELECTION);
+    }
   };
 
-  // Handle loading state timeout
+  // If page reloads and state is RESULT/LOADING/SEARCH_SPECIALIST but resultData is null,
+  // we reset evaluationState to SELECTION
   useEffect(() => {
-    console.log("evaluationState: ", evaluationState)
-    if (evaluationState === EvaluationState.LOADING) {
-      const timer = setTimeout(() => {
-        setEvaluationState(EvaluationState.RESULT);
-      }, 4000);
-      return () => clearTimeout(timer);
+    if (evaluationState !== EvaluationState.START && evaluationState !== EvaluationState.SELECTION && !resultData) {
+      setEvaluationState(EvaluationState.SELECTION);
     }
-  }, [evaluationState]);
-  // Compute prediction results based on selection
-  const resultData = useMemo(() => getPredictionResult(selectedSymptoms), [selectedSymptoms]);
+  }, [evaluationState, resultData]);
 
-  // Persist result record when state transitions to RESULT
-  useEffect(() => {
-    if (evaluationState === EvaluationState.RESULT && selectedSymptoms.length > 0) {
-      const symptomsStr = selectedSymptoms
-        .map(id => ALL_SYMPTOMS.find(s => s.id === id)?.label)
-        .filter(Boolean)
-        .join(', ');
-
-      addLocalHistoryRecord({
-        title: resultData.title,
-        specialist: resultData.specialist,
-        confidence: resultData.confidence,
-        alert: resultData.confidence > 90,
-        symptoms: symptomsStr || 'Symptômes mineurs',
-      });
-    }
-  }, [evaluationState, resultData, selectedSymptoms]);
+  // Show a premium loading spinner while fetching the symptoms list from the backend
+  if (isLoadingSymptoms) {
+    return (
+      <div className="h-full flex items-center justify-center min-h-[400px] max-w-6xl mx-auto">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-primary dark:border-slate-800 dark:border-t-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div id="evaluation-page" className="space-y-6  max-w-6xl mx-auto pb-24 text-slate-800 dark:text-slate-100">
@@ -346,8 +297,8 @@ export default function EvaluationPage() {
           selectedSymptoms={selectedSymptoms}
           onToggleSymptom={toggleSymptom}
           onStartAnalysis={handleStartAnalysis}
-          allSymptoms={ALL_SYMPTOMS}
-          frequentSymptomIds={FREQUENT_SYMPTOM_IDS}
+          allSymptoms={allSymptoms}
+          frequentSymptomIds={frequentSymptomIds}
         />
       )}
 
@@ -357,23 +308,22 @@ export default function EvaluationPage() {
       )}
 
       {/* State 3: Diagnostic prediction result */}
-      {evaluationState === EvaluationState.RESULT && (
+      {evaluationState === EvaluationState.RESULT && resultData && (
         <EvaluationResult 
           resultData={resultData}
           onBackToSelection={() => setEvaluationState(EvaluationState.SELECTION)}
-          onFindSpecialists={() => setEvaluationState(EvaluationState.SEARCH_SPECIALIST)}
-          onNavigateToFollowups={() => {
-            addLocalFollowUp(resultData.title, t('dashboard.pages.suivis.active_followup_status', 'À faire'));
-            navigate('/dashboard/suivis');
+          onFindSpecialists={(specName) => {
+            setSelectedSpecialist(specName);
+            setEvaluationState(EvaluationState.SEARCH_SPECIALIST);
           }}
         />
       )}
 
       {/* State 4: Recommended specialist and locator map */}
-      {evaluationState === EvaluationState.SEARCH_SPECIALIST && (
+      {evaluationState === EvaluationState.SEARCH_SPECIALIST && resultData && (
         <SpecialistFinder 
-          specialist={resultData.specialist}
-          doctors={resultData.doctors}
+          specialist={selectedSpecialist || resultData.specialist}
+          doctors={getDoctorsForSpecialist(selectedSpecialist || resultData.specialist, i18n.language)}
           onBackToResults={() => setEvaluationState(EvaluationState.RESULT)}
         />
       )}

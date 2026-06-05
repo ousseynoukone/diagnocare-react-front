@@ -60,9 +60,6 @@ export default function DashboardPage() {
             {t('dashboard.home.subtitle', 'Bienvenue {{name}}, voici votre aperçu santé du jour.', { name: getFirstName() })}
           </p>
         </div>
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-4 py-1.5 shadow-sm text-xs font-semibold text-slate-400 dark:text-slate-500 shrink-0">
-          {t('dashboard.home.last_updated', "Dernière màj: à l'instant")}
-        </div>
       </div>
 
       {/* Stats Cards Section */}

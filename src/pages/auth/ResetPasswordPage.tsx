@@ -39,7 +39,6 @@ export default function ResetPasswordPage() {
     }, [resendCooldown]);
 
     const handleSendOtp = (email: string) => {
-        setGeneralError(null);
         requestReset(email, {
             onSuccess: () => {
                 toast.success(t('auth.reset_password.success_email_sent'));
@@ -53,7 +52,6 @@ export default function ResetPasswordPage() {
     };
 
     const onSubmit = (data: any) => {
-        setGeneralError(null);
         if (step === 1) {
             handleSendOtp(data.email);
         } else {

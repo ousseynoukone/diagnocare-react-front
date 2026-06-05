@@ -1,10 +1,12 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   getPredictionsByUserId, 
   getDetailedPredictionsByUser,
-  createPredictionRequest
+  createPredictionRequest,
+  deletePrediction,
+  deleteAllPredictions
 } from '../api-s/requests/PredictionRequest';
-import type { CreatePredictionRequest } from '../api-s/requests/PredictionRequest';
+import type { CreatePredictionRequest } from '../types/models/Prediction';
 
 export const usePredictions = (userId: number | undefined) => {
   return useQuery({
@@ -27,3 +29,26 @@ export const useCreatePrediction = () => {
     mutationFn: (request: CreatePredictionRequest) => createPredictionRequest(request),
   });
 };
+
+export const useDeletePrediction = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deletePrediction(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['predictions'] });
+      queryClient.invalidateQueries({ queryKey: ['predictions-detailed'] });
+    },
+  });
+};
+
+export const useDeleteAllPredictions = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: number) => deleteAllPredictions(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['predictions'] });
+      queryClient.invalidateQueries({ queryKey: ['predictions-detailed'] });
+    },
+  });
+};
+
