@@ -4,10 +4,13 @@ import { apiClient } from '../AxiosApiClient';
 
 
 // Fetch medical profile by user ID
-export function getProfileByUserId(userId: number): Promise<PatientMedicalProfileDTO> {
+export function getProfileByUserId(userId: number): Promise<PatientMedicalProfileDTO | null> {
   return apiClient.get(`/patient-profiles/user/${userId}`)
     .then((response) => response.data.data ?? response.data)
     .catch((error) => {
+      if (error?.response?.status === 404) {
+        return null;
+      }
       console.error('Fetching medical profile failed:', error);
       throw error;
     });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Info, Save } from 'lucide-react';
+import { Info, Save, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserStore } from '../../store/UserStore';
 import { useProfile, useSaveProfile } from '../../hooks/useProfile';
@@ -20,24 +20,38 @@ export default function ProfilMedicalPage() {
 
   const [profile, setProfile] = useState<MedicalProfile>(DEFAULT_PROFILE);
 
+  const isProfileIncomplete = !dbProfile || 
+                              !dbProfile.age || 
+                              dbProfile.age === 0 || 
+                              !dbProfile.weight || 
+                              dbProfile.weight === 0 || 
+                              !dbProfile.gender;
+
   // Sync state when dbProfile is loaded/updated
   useEffect(() => {
     const saved = localStorage.getItem(PROFILE_STORAGE_KEY);
-    let currentProfile = saved ? JSON.parse(saved) : DEFAULT_PROFILE;
+    let currentProfile = DEFAULT_PROFILE;
+    if (saved) {
+      try {
+        currentProfile = { ...DEFAULT_PROFILE, ...JSON.parse(saved) };
+      } catch (e) {
+        console.error('Failed to parse saved profile:', e);
+      }
+    }
 
     if (dbProfile) {
       currentProfile = {
         ...currentProfile,
-        age: dbProfile.age ? String(dbProfile.age) : currentProfile.age,
-        sexe: dbProfile.gender === 'FEMALE' ? 'Femme' : (dbProfile.gender === 'MALE' ? 'Homme' : currentProfile.sexe),
-        poids: dbProfile.weight ? String(dbProfile.weight) : currentProfile.poids,
-        taille: currentProfile.taille || (dbProfile.bmi && dbProfile.weight ? String(Math.round(Math.sqrt(dbProfile.weight / dbProfile.bmi) * 100)) : ''),
-        tension: dbProfile.meanBloodPressure ? String(Math.round(dbProfile.meanBloodPressure / 10)) : currentProfile.tension,
-        cholesterol: dbProfile.meanCholesterol ? (dbProfile.meanCholesterol / 100).toFixed(2) : currentProfile.cholesterol,
-        antecedents: dbProfile.familyAntecedents && dbProfile.familyAntecedents.length > 0 ? dbProfile.familyAntecedents.join(', ') : currentProfile.antecedents,
-        tabac: dbProfile.isSmoking !== undefined ? (dbProfile.isSmoking ? 'oui' : 'non') : currentProfile.tabac,
-        alcool: dbProfile.alcohol !== undefined ? (dbProfile.alcohol ? (currentProfile.alcool !== 'jamais' ? currentProfile.alcool : 'occasionnelle') : 'jamais') : currentProfile.alcool,
-        activite: dbProfile.sedentary !== undefined ? (dbProfile.sedentary ? 'Sédentaire (peu ou pas de sport)' : (currentProfile.activite !== 'Sédentaire (peu ou pas de sport)' ? currentProfile.activite : 'Actif (1-3 séances de sport/semaine)')) : currentProfile.activite,
+        age: dbProfile.age ? String(dbProfile.age) : (currentProfile.age || ''),
+        sexe: dbProfile.gender === 'FEMALE' ? 'Femme' : (dbProfile.gender === 'MALE' ? 'Homme' : (currentProfile.sexe || 'Homme')),
+        poids: dbProfile.weight ? String(dbProfile.weight) : (currentProfile.poids || ''),
+        taille: (dbProfile.bmi && dbProfile.weight ? String(Math.round(Math.sqrt(dbProfile.weight / dbProfile.bmi) * 100)) : '') || currentProfile.taille || '',
+        tension: dbProfile.meanBloodPressure ? String(Math.round(dbProfile.meanBloodPressure / 10)) : (currentProfile.tension || ''),
+        cholesterol: dbProfile.meanCholesterol ? (dbProfile.meanCholesterol / 100).toFixed(2) : (currentProfile.cholesterol || ''),
+        antecedents: dbProfile.familyAntecedents && dbProfile.familyAntecedents.length > 0 ? dbProfile.familyAntecedents.join(', ') : (currentProfile.antecedents || ''),
+        tabac: dbProfile.isSmoking !== undefined ? (dbProfile.isSmoking ? 'oui' : 'non') : (currentProfile.tabac || 'non'),
+        alcool: dbProfile.alcohol !== undefined ? (dbProfile.alcohol ? (currentProfile.alcool !== 'jamais' ? currentProfile.alcool : 'occasionnelle') : 'jamais') : (currentProfile.alcool || 'jamais'),
+        activite: dbProfile.sedentary !== undefined ? (dbProfile.sedentary ? 'Sédentaire (peu ou pas de sport)' : (currentProfile.activite !== 'Sédentaire (peu ou pas de sport)' ? currentProfile.activite : 'Actif (1-3 séances de sport/semaine)')) : (currentProfile.activite || 'Sédentaire (peu ou pas de sport)'),
       };
     }
     setProfile(currentProfile);
@@ -139,6 +153,23 @@ export default function ProfilMedicalPage() {
             <span>{saveProfileMutation.isPending ? t('common.saving', 'Enregistrement...') : t('dashboard.pages.profil.save_btn', 'Enregistrer')}</span>
           </button>
         </div>
+
+        {/* Profile Incomplete Warning Banner */}
+        {isProfileIncomplete && (
+          <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-5 flex items-start gap-3.5 shadow-sm animate-pulse">
+            <div className="bg-amber-100 dark:bg-amber-900/40 p-2 rounded-xl text-amber-600 dark:text-amber-400 shrink-0">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-amber-900 dark:text-amber-300">
+                {t('dashboard.pages.profil.incomplete_title', 'Profil médical obligatoire')}
+              </h4>
+              <p className="text-xs sm:text-sm text-amber-705 dark:text-amber-400 leading-relaxed mt-1 font-semibold">
+                {t('dashboard.pages.profil.incomplete_desc', 'Veuillez renseigner et enregistrer vos informations médicales obligatoires (Âge, Sexe biologique, Poids et Taille) pour débloquer l\'utilisation de l\'application.')}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Security Info Banner */}
         <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-2xl p-4.5 flex items-start gap-3.5 shadow-xs">

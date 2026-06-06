@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import logoBlue from '../../assets/logo-blue.svg';
 import ToggleDarkMode from '../basics/ToggleDarkMode';
 import SwitchLanguage from '../basics/SwitchLanguage';
+import { useProfile } from '../../hooks/useProfile';
 
 export default function SideBar() {
   const { t } = useTranslation();
@@ -25,12 +26,19 @@ export default function SideBar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
+  const { data: dbProfile } = useProfile(user?.id);
+  const isProfileIncomplete = !dbProfile || 
+                              !dbProfile.age || 
+                              dbProfile.age === 0 || 
+                              !dbProfile.weight || 
+                              dbProfile.weight === 0 || 
+                              !dbProfile.gender;
+
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("Failed to log out from server, clearing local session:", error);
-      // Fallback: clear the local user state manually
       useUserStore.getState().clearUser();
     } finally {
       setIsOpen(false);
@@ -46,7 +54,6 @@ export default function SideBar() {
     { label: t('dashboard.sidebar.profil', 'Profil médical'), path: '/dashboard/profil', icon: User },
     { label: t('dashboard.sidebar.parametres', 'Paramètres'), path: '/dashboard/parametres', icon: Settings },
   ];
-
 
   // Get user initials for avatar
   const getInitials = () => {
@@ -71,25 +78,36 @@ export default function SideBar() {
       {/* Top Part: Logo & Menu */}
       <div className="space-y-8">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-2 cursor-pointer" onClick={() => navigate('/home')}>
+        <div className="flex items-center gap-3 px-2 cursor-pointer" onClick={() => !isProfileIncomplete && navigate('/home')}>
           <img src={logoBlue} alt="DiagnoCare Logo" className="h-12 w-auto " />
           <span className="text-xl font-bold tracking-tight text-white">DiagnoCare</span>
         </div>
-
+ 
         {/* Navigation Items */}
         <nav className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
+            const isItemDisabled = isProfileIncomplete && item.path !== '/dashboard/profil';
+
             return (
               <NavLink
                 key={item.path}
-                to={item.path}
+                to={isItemDisabled ? '#' : item.path}
                 end={item.end}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  if (isItemDisabled) {
+                    e.preventDefault();
+                    return;
+                  }
+                  setIsOpen(false);
+                }}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer ${isActive
-                    ? 'bg-primary text-white shadow-md shadow-primary/30 font-semibold'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                  `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    isItemDisabled
+                      ? 'opacity-30 cursor-not-allowed pointer-events-none text-slate-650'
+                      : 'cursor-pointer ' + (isActive
+                          ? 'bg-primary text-white shadow-md shadow-primary/30 font-semibold'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/40')
                   }`
                 }
               >
