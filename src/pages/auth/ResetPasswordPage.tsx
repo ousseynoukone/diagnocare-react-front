@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import logo from '../../assets/logo-blue.svg';
 import Button from '../../components/basics/Button';
-import { ArrowRight, AlertTriangle, RefreshCw, KeyRound, Lock, Mail } from 'lucide-react';
+import { ArrowRight, AlertTriangle, RefreshCw, KeyRound, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useResetPassword, useResetPasswordConfirm } from '../../hooks/useAuth';
 import { handleApiError } from '../../utils/errorHelper';
@@ -16,6 +16,8 @@ export default function ResetPasswordPage() {
     const [step, setStep] = useState<1 | 2>(1);
     const [generalError, setGeneralError] = useState<string | null>(null);
     const [resendCooldown, setResendCooldown] = useState(0);
+    const [showNewPwd, setShowNewPwd] = useState(false);
+    const [showConfirmPwd, setShowConfirmPwd] = useState(false);
 
     const { mutate: requestReset, isPending: isRequesting } = useResetPassword();
     const { mutate: confirmReset, isPending: isConfirming } = useResetPasswordConfirm();
@@ -206,10 +208,10 @@ export default function ResetPasswordPage() {
                                     </span>
                                     <input
                                         id="newPassword"
-                                        type="password"
+                                        type={showNewPwd ? "text" : "password"}
                                         placeholder={t('auth.reset_password.new_password_placeholder')}
                                         disabled={isConfirming || isRequesting}
-                                        className={`w-full rounded-lg border pl-10 pr-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.newPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                        className={`w-full rounded-lg border pl-10 pr-12 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.newPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                         {...register("newPassword", {
                                             required: "Le nouveau mot de passe est requis.",
                                             minLength: {
@@ -218,6 +220,13 @@ export default function ResetPasswordPage() {
                                             }
                                         })}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPwd((v) => !v)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                                    >
+                                        {showNewPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
                                 </div>
                                 {errors.newPassword && (
                                     <span className="text-red-500 text-xs mt-1 block">
@@ -237,14 +246,21 @@ export default function ResetPasswordPage() {
                                     </span>
                                     <input
                                         id="confirmPassword"
-                                        type="password"
+                                        type={showConfirmPwd ? "text" : "password"}
                                         placeholder={t('auth.reset_password.confirm_password_placeholder')}
                                         disabled={isConfirming || isRequesting}
-                                        className={`w-full rounded-lg border pl-10 pr-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                        className={`w-full rounded-lg border pl-10 pr-12 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                         {...register("confirmPassword", {
                                             required: "Veuillez confirmer le nouveau mot de passe."
                                         })}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPwd((v) => !v)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                                    >
+                                        {showConfirmPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
                                 </div>
                                 {errors.confirmPassword && (
                                     <span className="text-red-500 text-xs mt-1 block">

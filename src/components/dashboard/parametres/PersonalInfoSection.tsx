@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, Phone, Save, Lock, X } from 'lucide-react';
+import { Mail, Phone, Save, Lock, X, Eye, EyeOff } from 'lucide-react';
 import { useUserStore } from '../../../store/UserStore';
 import type { UpdateUserPayload } from '../../../store/UserStore';
 import { toast } from 'sonner';
@@ -24,6 +24,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
   // Email confirmation modal states
   const [isConfirmPasswordOpen, setIsConfirmPasswordOpen] = useState(false);
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
   const [pendingPayload, setPendingPayload] = useState<UpdateUserPayload | null>(null);
@@ -98,6 +99,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
 
       setIsConfirmPasswordOpen(false);
       setConfirmPasswordInput('');
+      setShowConfirmPassword(false);
 
       // Save other profile changes (firstName, lastName, phone) without the email field
       const profilePayload = { ...pendingPayload };
@@ -146,7 +148,11 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
       toast.success(t('dashboard.pages.parametres.email_updated_verified', 'Adresse email mise à jour et vérifiée avec succès !'));
       
       // Update store user so that UI updates the displayed email immediately
-      const updatedUser = toUserProfileDTO(response.data.user);
+      const userObj = response.data?.data?.user ?? response.data?.user;
+      if (!userObj) {
+        throw new Error('No user data returned from email confirmation');
+      }
+      const updatedUser = toUserProfileDTO(userObj);
       useUserStore.getState().setUser(updatedUser);
       
       setIsOtpVerificationOpen(false);
@@ -215,7 +221,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-555 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
           <Phone className="h-3.5 w-3.5" /> {t('dashboard.pages.parametres.phone', 'Téléphone')}
         </label>
         <input
@@ -256,6 +262,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
                 onClick={() => {
                   setIsConfirmPasswordOpen(false);
                   setPendingPayload(null);
+                  setShowConfirmPassword(false);
                 }} 
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1"
               >
@@ -271,13 +278,22 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
               <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 {t('dashboard.pages.parametres.password_label', 'Mot de passe actuel')}
               </label>
-              <input
-                type="password"
-                value={confirmPasswordInput}
-                onChange={(e) => setConfirmPasswordInput(e.target.value)}
-                placeholder={t('dashboard.pages.parametres.confirm_pwd_placeholder', 'Saisissez votre mot de passe actuel')}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPasswordInput}
+                  onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                  placeholder={t('dashboard.pages.parametres.confirm_pwd_placeholder', 'Saisissez votre mot de passe actuel')}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 pr-12 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all shadow-inner placeholder-slate-400 dark:placeholder-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {confirmPasswordError && (
                 <p className="text-xs text-red-500 font-semibold">{confirmPasswordError}</p>
               )}
@@ -288,6 +304,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
                 onClick={() => {
                   setIsConfirmPasswordOpen(false);
                   setPendingPayload(null);
+                  setShowConfirmPassword(false);
                 }}
                 className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-sm transition-colors cursor-pointer"
               >
@@ -332,7 +349,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
             </div>
             
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {t('dashboard.pages.parametres.otp_modal_desc', 'Un code de validation à 6 chiffres a été envoyé à votre nouvelle adresse email.')} <strong className="text-slate-700 dark:text-slate-250">{newEmailPendingVerification}</strong>.
+              {t('dashboard.pages.parametres.otp_modal_desc', 'Un code de validation à 6 chiffres a été envoyé à votre nouvelle adresse email.')} <strong className="text-slate-700 dark:text-slate-200">{newEmailPendingVerification}</strong>.
             </p>
 
             <div className="space-y-2">
@@ -345,7 +362,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="Ex: 123456"
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-center tracking-[0.5em] text-lg font-bold shadow-inner"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-center tracking-[0.5em] text-lg font-bold shadow-inner placeholder-slate-400 dark:placeholder-slate-500"
               />
               {otpError && (
                 <p className="text-xs text-red-500 font-semibold text-center">{otpError}</p>
@@ -357,7 +374,7 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
                 type="button"
                 onClick={handleResendOtp}
                 disabled={isResendingOtp}
-                className="text-xs font-bold text-primary hover:text-primary-700 disabled:opacity-60 cursor-pointer transition-colors bg-transparent border-none"
+                className="text-xs font-bold text-primary hover:text-primary-700 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-60 cursor-pointer transition-colors bg-transparent border-none"
               >
                 {isResendingOtp 
                   ? t('dashboard.pages.parametres.otp_resending', 'Renvoi en cours...') 

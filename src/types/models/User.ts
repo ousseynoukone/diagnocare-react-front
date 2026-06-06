@@ -15,18 +15,18 @@ export interface UserProfileDTO {
 export function toUserProfileDTO(apiUser: any): UserProfileDTO {
     let role: Role = Role.PATIENT;
 
-    if (apiUser.roles && Array.isArray(apiUser.roles) && apiUser.roles.length > 0) {
+    if (apiUser && apiUser.roles && Array.isArray(apiUser.roles) && apiUser.roles.length > 0) {
         role = (apiUser.roles[0].id ?? apiUser.roles[0]) as Role;
     }
 
     return {
-        id: apiUser.id,
-        email: apiUser.email,
-        firstName: apiUser.firstName,
-        lastName: apiUser.lastName,
-        phoneNumber: apiUser.phoneNumber ?? '',
-        lang: apiUser.lang ?? 'fr',
+        id: apiUser?.id,
+        email: apiUser?.email,
+        firstName: apiUser?.firstName,
+        lastName: apiUser?.lastName,
+        phoneNumber: apiUser?.phoneNumber ?? '',
+        lang: apiUser?.lang ?? 'fr',
         role,
-        emailVerified: apiUser.emailVerified !== undefined ? apiUser.emailVerified : true,
+        emailVerified: apiUser?.emailVerified !== undefined ? apiUser?.emailVerified : true,
     };
 }

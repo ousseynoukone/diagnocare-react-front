@@ -508,7 +508,7 @@ export default function HistoriquePage() {
                               <div 
                                 key={idx} 
                                 onClick={() => setActiveHistoryPossibility(alt)}
-                                className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100/60 dark:hover:bg-slate-900/50 hover:border-slate-250 dark:hover:border-slate-700 transition-all duration-200 cursor-pointer"
+                                className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/60 hover:bg-slate-100/60 dark:hover:bg-slate-900/50 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 cursor-pointer"
                               >
                                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                   {alt.title}
