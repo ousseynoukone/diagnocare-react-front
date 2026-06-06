@@ -39,7 +39,7 @@ export default function SecuritySection() {
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 space-y-4">
-      <div className="flex items-center gap-3 mb-1">
+      <div className="flex items-center gap-3 mb-4">
         <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
           <Lock className="h-5 w-5" />
         </div>
@@ -53,7 +53,7 @@ export default function SecuritySection() {
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-3">
         <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
           {t('dashboard.pages.parametres.new_pwd', 'Nouveau mot de passe')}
         </label>
@@ -75,7 +75,7 @@ export default function SecuritySection() {
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-3">
         <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
           {t('dashboard.pages.parametres.confirm_pwd', 'Confirmer le mot de passe')}
         </label>

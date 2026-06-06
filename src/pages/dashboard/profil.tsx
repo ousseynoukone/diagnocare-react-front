@@ -64,30 +64,72 @@ export default function ProfilMedicalPage() {
       return;
     }
 
-    // Save to local storage for local detail retention (e.g. height, specific activity string)
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    // Convert and Validate Inputs
+    const age = parseInt(profile.age);
+    if (isNaN(age) || age < 1 || age > 120) {
+      toast.error(t('dashboard.pages.profil.validation.age', "L'âge doit être compris entre 1 et 120 ans."));
+      return;
+    }
 
-    // Convert local MedicalProfile to PatientMedicalProfileRequestDTO
-    const age = parseInt(profile.age) || 0;
+    const weight = parseFloat(profile.poids);
+    if (isNaN(weight) || weight < 2 || weight > 300) {
+      toast.error(t('dashboard.pages.profil.validation.weight', "Le poids doit être compris entre 2 et 300 kg."));
+      return;
+    }
+
+    const heightCm = parseFloat(profile.taille);
+    if (isNaN(heightCm) || heightCm < 30 || heightCm > 250) {
+      toast.error(t('dashboard.pages.profil.validation.height', "La taille doit être comprise entre 30 et 250 cm."));
+      return;
+    }
+
     const gender = profile.sexe === 'Femme' ? GenderEnum.FEMALE : (profile.sexe === 'Homme' ? GenderEnum.MALE : null);
-    const weight = parseFloat(profile.poids) || 0;
-    const heightCm = parseFloat(profile.taille) || 0;
 
     // Calculate BMI
     const heightM = heightCm / 100;
     const bmi = weight && heightM ? Math.round(weight / (heightM * heightM)) : 0;
 
-    // Parse blood pressure (systolic)
+    // Parse and validate blood pressure (systolic/diastolic) if entered
     let meanBloodPressure = 0;
     if (profile.tension) {
+      const tensionRegex = /^\d{1,3}\/\d{1,3}$/;
+      if (!tensionRegex.test(profile.tension)) {
+        toast.error(t('dashboard.pages.profil.validation.tension_format', "La tension doit être au format Systolique/Diastolique (ex: 12/8 ou 120/80)."));
+        return;
+      }
       const parts = profile.tension.split('/');
       const sys = parseFloat(parts[0]) || 0;
-      meanBloodPressure = sys <= 20 ? sys * 10 : sys;
+      const dia = parseFloat(parts[1]) || 0;
+      
+      const normSys = sys <= 20 ? sys * 10 : sys;
+      const normDia = dia <= 20 ? dia * 10 : dia;
+
+      if (normSys < 50 || normSys > 250) {
+        toast.error(t('dashboard.pages.profil.validation.sys_value', "La tension systolique doit être comprise entre 50 et 250 mmHg."));
+        return;
+      }
+      if (normDia < 30 || normDia > 150) {
+        toast.error(t('dashboard.pages.profil.validation.dia_value', "La tension diastolique doit être comprise entre 30 et 150 mmHg."));
+        return;
+      }
+      meanBloodPressure = normSys;
     }
 
-    // Parse cholesterol (g/L to mg/dL, or keeps mg/dL)
-    const rawChol = parseFloat(profile.cholesterol) || 0;
-    const meanCholesterol = rawChol > 10 ? rawChol : rawChol * 100;
+    // Parse and validate cholesterol if entered
+    let meanCholesterol = 0;
+    if (profile.cholesterol) {
+      const rawChol = parseFloat(profile.cholesterol);
+      if (isNaN(rawChol) || rawChol <= 0) {
+        toast.error(t('dashboard.pages.profil.validation.chol_invalid', "Veuillez entrer une valeur de cholestérol valide."));
+        return;
+      }
+      const normChol = rawChol > 10 ? rawChol : rawChol * 100;
+      if (normChol < 50 || normChol > 500) {
+        toast.error(t('dashboard.pages.profil.validation.chol_value', "Le cholestérol doit être compris entre 0.50 et 5.00 g/L (50 et 500 mg/dL)."));
+        return;
+      }
+      meanCholesterol = normChol;
+    }
 
     const sedentary = profile.activite.includes('Sédentaire');
     const isSmoking = profile.tabac === 'oui';
@@ -109,6 +151,9 @@ export default function ProfilMedicalPage() {
       isSmoking,
       familyAntecedents,
     };
+
+    // Save to local storage for local detail retention (e.g. height, specific activity string)
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
 
     try {
       await saveProfileMutation.mutateAsync(requestPayload);

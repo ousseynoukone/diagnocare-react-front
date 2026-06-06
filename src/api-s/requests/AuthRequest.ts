@@ -66,7 +66,7 @@ export function RefreshTokenRequest() {
 
 // Reset password request (sends verification code to the email)
 export function ResetPasswordRequest(email: string) {
-    return SendOtpRequest({ email })
+    return SendOtpRequest({ email, purpose: 'reset_password' })
         .catch(error => {
             console.error('Reset password request failed:', error);
             throw error;

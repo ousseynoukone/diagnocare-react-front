@@ -4,7 +4,6 @@ import {
   Activity,
   Clock,
   FileText,
-  ClipboardList,
   User,
   Settings,
   LogOut,

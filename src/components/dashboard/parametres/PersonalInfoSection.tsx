@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Mail, Phone, Save, Lock, X } from 'lucide-react';
 import { useUserStore } from '../../../store/UserStore';
 import type { UpdateUserPayload } from '../../../store/UserStore';
 import { toast } from 'sonner';
 import { apiClient } from '../../../api-s/AxiosApiClient';
+import { toUserProfileDTO } from '../../../types/models/User';
 
 interface PersonalInfoSectionProps {
   user: any;
@@ -13,7 +13,6 @@ interface PersonalInfoSectionProps {
 
 export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const updateUser = useUserStore((state) => state.updateUser);
 
   const [firstName, setFirstName] = useState(user?.firstName ?? '');
@@ -29,6 +28,14 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
   const [pendingPayload, setPendingPayload] = useState<UpdateUserPayload | null>(null);
 
+  // OTP Verification Modal states
+  const [isOtpVerificationOpen, setIsOtpVerificationOpen] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [newEmailPendingVerification, setNewEmailPendingVerification] = useState('');
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
+
   const executeSaveProfile = async (payload: UpdateUserPayload) => {
     setIsSavingProfile(true);
     try {
@@ -37,8 +44,10 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
       
       if (payload.email) {
         toast.info(t('dashboard.pages.parametres.email_verification_sent', 'Un code de vérification a été envoyé à votre nouvelle adresse email.'));
-        useUserStore.getState().clearUser();
-        navigate(`/verify-email?email=${encodeURIComponent(payload.email)}`);
+        setNewEmailPendingVerification(payload.email);
+        setOtpCode('');
+        setOtpError('');
+        setIsOtpVerificationOpen(true);
       }
     } catch {
       toast.error(t('dashboard.pages.parametres.profile_error', 'Erreur lors de la mise à jour du profil.'));
@@ -75,24 +84,94 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
       setConfirmPasswordError(t('dashboard.pages.parametres.confirm_pwd_required', 'Le mot de passe est requis.'));
       return;
     }
-    if (!user?.email || !pendingPayload) return;
+    if (!user?.id || !pendingPayload?.email) return;
 
     setIsVerifyingPassword(true);
     setConfirmPasswordError('');
     try {
-      await apiClient.post('/auth/login', {
-        email: user.email,
+      // Initiate email change on backend (checks password and sends OTP to the new email)
+      await apiClient.post('/auth/users/email/request-change', {
+        userId: user.id,
+        newEmail: pendingPayload.email,
         password: confirmPasswordInput
       });
 
       setIsConfirmPasswordOpen(false);
-      await executeSaveProfile(pendingPayload);
+      setConfirmPasswordInput('');
+
+      // Save other profile changes (firstName, lastName, phone) without the email field
+      const profilePayload = { ...pendingPayload };
+      delete profilePayload.email;
+
+      if (Object.keys(profilePayload).length > 0) {
+        await updateUser(profilePayload);
+        toast.success(t('dashboard.pages.parametres.profile_saved', 'Profil mis à jour avec succès.'));
+      }
+
+      toast.info(t('dashboard.pages.parametres.email_verification_sent', 'Un code de vérification a été envoyé à votre nouvelle adresse email.'));
+      setNewEmailPendingVerification(pendingPayload.email);
+      setOtpCode('');
+      setOtpError('');
+      setIsOtpVerificationOpen(true);
       setPendingPayload(null);
     } catch (err: any) {
-      console.error('Password verification failed:', err);
-      setConfirmPasswordError(t('dashboard.pages.parametres.confirm_pwd_incorrect', 'Mot de passe incorrect.'));
+      console.error('Email change request failed:', err);
+      const status = err.response?.status;
+      if (status === 401) {
+        setConfirmPasswordError(t('dashboard.pages.parametres.confirm_pwd_incorrect', 'Mot de passe incorrect.'));
+      } else if (status === 409) {
+        setConfirmPasswordError(t('dashboard.pages.parametres.email_already_in_use', 'Cette adresse email est déjà utilisée.'));
+      } else {
+        setConfirmPasswordError(t('dashboard.pages.parametres.request_error', 'Une erreur est survenue lors de la demande.'));
+      }
     } finally {
       setIsVerifyingPassword(false);
+    }
+  };
+
+  const handleValidateEmailOtp = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      setOtpError(t('dashboard.pages.parametres.otp_invalid_format', 'Le code doit contenir 6 chiffres.'));
+      return;
+    }
+    setIsVerifyingOtp(true);
+    setOtpError('');
+    try {
+      const response = await apiClient.post('/auth/users/email/confirm-change', {
+        userId: user.id,
+        newEmail: newEmailPendingVerification,
+        code: otpCode
+      });
+
+      toast.success(t('dashboard.pages.parametres.email_updated_verified', 'Adresse email mise à jour et vérifiée avec succès !'));
+      
+      // Update store user so that UI updates the displayed email immediately
+      const updatedUser = toUserProfileDTO(response.data.user);
+      useUserStore.getState().setUser(updatedUser);
+      
+      setIsOtpVerificationOpen(false);
+      setNewEmailPendingVerification('');
+    } catch (err: any) {
+      console.error('OTP validation failed:', err);
+      setOtpError(t('dashboard.pages.parametres.otp_incorrect', 'Code de vérification incorrect ou expiré.'));
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setIsResendingOtp(true);
+    try {
+      await apiClient.post('/auth/users/email/resend-change', {
+        userId: user.id,
+        newEmail: newEmailPendingVerification
+      });
+      toast.success(t('dashboard.pages.parametres.otp_resent', 'Un nouveau code a été envoyé.'));
+    } catch (err) {
+      console.error('Resending OTP failed:', err);
+      toast.error(t('dashboard.pages.parametres.otp_resend_error', 'Erreur lors du renvoi du code.'));
+    } finally {
+      setIsResendingOtp(false);
     }
   };
 
@@ -222,6 +301,89 @@ export default function PersonalInfoSection({ user }: PersonalInfoSectionProps) 
                 {isVerifyingPassword
                   ? t('common.loading', 'Chargement...')
                   : t('common.confirm', 'Confirmer')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isOtpVerificationOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md shadow-2xl p-8 space-y-6 animate-scaleIn">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-full text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">
+                  <Mail className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {t('dashboard.pages.parametres.otp_modal_title', 'Vérification de l\'email')}
+                </h3>
+              </div>
+              <button 
+                onClick={() => {
+                  setIsOtpVerificationOpen(false);
+                  setNewEmailPendingVerification('');
+                  setEmail(user?.email ?? '');
+                }} 
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {t('dashboard.pages.parametres.otp_modal_desc', 'Un code de validation à 6 chiffres a été envoyé à votre nouvelle adresse email.')} <strong className="text-slate-700 dark:text-slate-250">{newEmailPendingVerification}</strong>.
+            </p>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                {t('dashboard.pages.parametres.otp_label', 'Code de vérification')}
+              </label>
+              <input
+                type="text"
+                maxLength={6}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="Ex: 123456"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-center tracking-[0.5em] text-lg font-bold shadow-inner"
+              />
+              {otpError && (
+                <p className="text-xs text-red-500 font-semibold text-center">{otpError}</p>
+              )}
+            </div>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={isResendingOtp}
+                className="text-xs font-bold text-primary hover:text-primary-700 disabled:opacity-60 cursor-pointer transition-colors bg-transparent border-none"
+              >
+                {isResendingOtp 
+                  ? t('dashboard.pages.parametres.otp_resending', 'Renvoi en cours...') 
+                  : t('dashboard.pages.parametres.otp_resend', 'Renvoyer le code')}
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setIsOtpVerificationOpen(false);
+                  setNewEmailPendingVerification('');
+                  setEmail(user?.email ?? '');
+                }}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl text-sm transition-colors cursor-pointer"
+              >
+                {t('common.cancel', 'Annuler')}
+              </button>
+              <button
+                onClick={handleValidateEmailOtp}
+                disabled={isVerifyingOtp || otpCode.length !== 6}
+                className="flex-1 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 disabled:opacity-60 disabled:cursor-not-allowed text-white dark:text-slate-900 font-bold py-3 rounded-xl text-sm transition-all cursor-pointer shadow-md"
+              >
+                {isVerifyingOtp
+                  ? t('common.loading', 'Validation...')
+                  : t('common.confirm', 'Valider')}
               </button>
             </div>
           </div>

@@ -27,6 +27,7 @@ export interface RegisterDTO{
 
 export interface OtpSendDTO {
     email: string;
+    purpose?: string;
 }
 
 export interface OtpValidateDTO {

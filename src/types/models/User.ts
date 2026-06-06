@@ -8,6 +8,7 @@ export interface UserProfileDTO {
     phoneNumber?: string;
     lang?: string;
     role: Role;
+    emailVerified?: boolean;
 }
 
 // Converts the raw API user into the frontend-friendly DTO
@@ -26,5 +27,6 @@ export function toUserProfileDTO(apiUser: any): UserProfileDTO {
         phoneNumber: apiUser.phoneNumber ?? '',
         lang: apiUser.lang ?? 'fr',
         role,
+        emailVerified: apiUser.emailVerified !== undefined ? apiUser.emailVerified : true,
     };
 }
