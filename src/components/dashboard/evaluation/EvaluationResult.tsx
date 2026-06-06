@@ -412,25 +412,25 @@ export default function EvaluationResult({
       {/* Report Issue Modal */}
       {isReportOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl p-6 space-y-6 animate-scaleIn">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl p-8 space-y-6 animate-scaleIn">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <AlertTriangle className="h-5.5 w-5.5 text-amber-500" />
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                   {t('dashboard.pages.evaluation.report_modal_title', 'Signaler un problème')}
                 </h3>
               </div>
               <button
                 onClick={() => setIsReportOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-550 dark:text-slate-450 uppercase tracking-wider">
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {t('dashboard.pages.evaluation.report_title_label', 'Titre de l\'anomalie')}
                 </label>
                 <input
@@ -438,38 +438,38 @@ export default function EvaluationResult({
                   value={reportTitle}
                   onChange={(e) => setReportTitle(e.target.value)}
                   placeholder={t('dashboard.pages.evaluation.report_title_placeholder', 'Ex: Diagnostic incohérent, symptômes erronés...')}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 placeholder-slate-400 transition-all"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 placeholder-slate-400 dark:placeholder-slate-500 transition-all shadow-inner"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-550 dark:text-slate-450 uppercase tracking-wider">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {t('dashboard.pages.evaluation.report_comment_label', 'Commentaires')}
                 </label>
                 <textarea
                   value={reportComment}
                   onChange={(e) => setReportComment(e.target.value)}
-                  rows={4}
+                  rows={5}
                   placeholder={t('dashboard.pages.evaluation.report_comment_placeholder', 'Veuillez décrire en détail le problème rencontré pour nous aider à améliorer notre algorithme...')}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 placeholder-slate-400 transition-all resize-none"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 placeholder-slate-400 dark:placeholder-slate-500 transition-all resize-none shadow-inner leading-relaxed"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setIsReportOpen(false)}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors cursor-pointer"
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold px-6 py-3 rounded-xl text-sm transition-colors cursor-pointer"
               >
                 {t('common.cancel', 'Annuler')}
               </button>
               <button
                 onClick={handleSubmitReport}
                 disabled={createReportMutation.isPending || !reportTitle.trim() || !reportComment.trim()}
-                className={`font-bold px-5 py-2.5 rounded-xl text-sm transition-all cursor-pointer text-white ${
+                className={`font-bold px-6 py-3 rounded-xl text-sm transition-all cursor-pointer text-white shadow-md ${
                   !reportTitle.trim() || !reportComment.trim()
-                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-50'
-                    : 'bg-slate-900 hover:bg-slate-800 dark:bg-slate-750 dark:hover:bg-slate-700 shadow-md'
+                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-50 shadow-none'
+                    : 'bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 shadow-amber-500/10'
                 }`}
               >
                 {createReportMutation.isPending ? t('common.sending', 'Envoi...') : t('common.send', 'Envoyer')}

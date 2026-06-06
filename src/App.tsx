@@ -15,7 +15,6 @@ import DashboardPage from './pages/dashboard/dashboard'
 import EvaluationPage from './pages/dashboard/evaluation'
 import SuivisPage from './pages/dashboard/suivis'
 import HistoriquePage from './pages/dashboard/historique'
-import ResumePage from './pages/dashboard/resume'
 import ProfilMedicalPage from './pages/dashboard/profil'
 import ParametresPage from './pages/dashboard/parametres'
 
@@ -42,7 +41,6 @@ function App() {
           <Route path="/dashboard/evaluation" element={<EvaluationPage />} />
           <Route path="/dashboard/suivis" element={<SuivisPage />} />
           <Route path="/dashboard/historique" element={<HistoriquePage />} />
-          <Route path="/dashboard/resume" element={<ResumePage />} />
           <Route path="/dashboard/profil" element={<ProfilMedicalPage />} />
           <Route path="/dashboard/parametres" element={<ParametresPage />} />
         </Route>

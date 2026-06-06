@@ -9,7 +9,7 @@ interface HealthIndicatorsCardProps {
 }
 
 const inputCls =
-  'w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500';
+  'w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500';
 
 export default function HealthIndicatorsCard({ tension, cholesterol, antecedents, onChange }: HealthIndicatorsCardProps) {
   const { t } = useTranslation();

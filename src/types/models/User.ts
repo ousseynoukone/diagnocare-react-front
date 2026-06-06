@@ -5,6 +5,8 @@ export interface UserProfileDTO {
     email: string;
     firstName: string;
     lastName: string;
+    phoneNumber?: string;
+    lang?: string;
     role: Role;
 }
 
@@ -21,6 +23,8 @@ export function toUserProfileDTO(apiUser: any): UserProfileDTO {
         email: apiUser.email,
         firstName: apiUser.firstName,
         lastName: apiUser.lastName,
+        phoneNumber: apiUser.phoneNumber ?? '',
+        lang: apiUser.lang ?? 'fr',
         role,
     };
 }

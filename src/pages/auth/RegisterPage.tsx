@@ -79,7 +79,7 @@ export default function RegisterPage() {
                                 type="text"
                                 placeholder="Jean"
                                 disabled={isPending}
-                                className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.firstName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                className={`w-full rounded-lg border px-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.firstName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                 {...register("firstName", {
                                     required: "Le prénom est requis.",
                                     minLength: { value: 2, message: "Le prénom doit faire au moins 2 caractères." }
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                                 type="text"
                                 placeholder="Dupont"
                                 disabled={isPending}
-                                className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.lastName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                className={`w-full rounded-lg border px-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.lastName ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                 {...register("lastName", {
                                     required: "Le nom est requis.",
                                     minLength: { value: 2, message: "Le nom doit faire au moins 2 caractères." }
@@ -123,7 +123,7 @@ export default function RegisterPage() {
                             placeholder={t('auth.register.email_placeholder')}
                             autoComplete="email"
                             disabled={isPending}
-                            className={`w-full rounded-lg border px-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                            className={`w-full rounded-lg border px-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                             {...register("email", {
                                 required: "L'adresse email est requise.",
                                 pattern: {
@@ -133,7 +133,7 @@ export default function RegisterPage() {
                             })}
                         />
                         {errors.email && (
-                            <span className="text-red-500 text-xs mt-1 block">
+                            <span className="text-red-550 text-xs mt-1 block">
                                 {errors.email.message as string}
                             </span>
                         )}
@@ -149,7 +149,7 @@ export default function RegisterPage() {
                                 placeholder={t('auth.login.password_placeholder')}
                                 autoComplete="new-password"
                                 disabled={isPending}
-                                className={`w-full rounded-lg border pl-3.5 pr-10 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                className={`w-full rounded-lg border pl-4.5 pr-11 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                 {...register("password", {
                                     required: "Le mot de passe est requis.",
                                     minLength: { value: 8, message: "Le mot de passe doit comporter au moins 8 caractères." }

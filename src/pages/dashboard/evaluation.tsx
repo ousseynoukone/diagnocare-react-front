@@ -13,6 +13,7 @@ import { useCreatePrediction } from '../../hooks/usePredictions';
 import { useUserStore } from '../../store/UserStore';
 import { useMLSymptomsMetadata } from '../../hooks/useSymptoms';
 import type { PredictionWithResultsResponse } from '../../types/models/Prediction';
+import { translateDisease, translateSpecialist } from '../../utils/translationHelper';
 
 
 const getDoctorsForSpecialist = (specialist: string, lang: string): Doctor[] => {
@@ -74,8 +75,12 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
   }
 
   const primary = predictions[0];
-  const title = isFr ? (primary.disease_fr || primary.disease) : (primary.disease_en || primary.disease);
-  const specialist = isFr ? (primary.specialist_fr || primary.specialist) : (primary.specialist_en || primary.specialist);
+  const rawTitle = isFr ? (primary.disease_fr || primary.disease) : (primary.disease_en || primary.disease);
+  const title = translateDisease(rawTitle, lang);
+  
+  const rawSpecialist = isFr ? (primary.specialist_fr || primary.specialist) : (primary.specialist_en || primary.specialist);
+  const specialist = translateSpecialist(rawSpecialist, lang);
+  
   const description = primary.description || '';
   
   let confidence = primary.probability ?? 80;
@@ -96,15 +101,18 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
       score = score * 100;
     }
     score = Math.round(score);
+    const rawName = isFr ? (alt.disease_fr || alt.disease) : (alt.disease_en || alt.disease);
     return {
-      name: isFr ? (alt.disease_fr || alt.disease) : (alt.disease_en || alt.disease),
+      name: translateDisease(rawName, lang),
       score
     };
   }).sort((a: any, b: any) => b.score - a.score);
 
   const allPossibilities = predictions.map((pred: any, index: number) => {
-    const pTitle = isFr ? (pred.disease_fr || pred.disease) : (pred.disease_en || pred.disease);
-    const pSpecialist = isFr ? (pred.specialist_fr || pred.specialist) : (pred.specialist_en || pred.specialist);
+    const rawPTitle = isFr ? (pred.disease_fr || pred.disease) : (pred.disease_en || pred.disease);
+    const rawPSpecialist = isFr ? (pred.specialist_fr || pred.specialist) : (pred.specialist_en || pred.specialist);
+    const pTitle = translateDisease(rawPTitle, lang);
+    const pSpecialist = translateSpecialist(rawPSpecialist, lang);
     const pDescription = pred.description || '';
     
     let pConfidence = pred.probability ?? 80;

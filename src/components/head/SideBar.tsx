@@ -43,7 +43,6 @@ export default function SideBar() {
     { label: t('dashboard.sidebar.evaluation', 'Évaluation'), path: '/dashboard/evaluation', icon: Activity },
     { label: t('dashboard.sidebar.suivis', 'Suivis'), path: '/dashboard/suivis', icon: Clock },
     { label: t('dashboard.sidebar.historique', 'Historique'), path: '/dashboard/historique', icon: FileText },
-    { label: t('dashboard.sidebar.resume', 'Résumé'), path: '/dashboard/resume', icon: ClipboardList },
     { label: t('dashboard.sidebar.profil', 'Profil médical'), path: '/dashboard/profil', icon: User },
     { label: t('dashboard.sidebar.parametres', 'Paramètres'), path: '/dashboard/parametres', icon: Settings },
   ];

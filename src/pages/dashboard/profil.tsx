@@ -2,63 +2,119 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Info, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { useUserStore } from '../../store/UserStore';
+import { useProfile, useSaveProfile } from '../../hooks/useProfile';
 import BasicInfoCard from '../../components/dashboard/profil/BasicInfoCard';
 import HealthIndicatorsCard from '../../components/dashboard/profil/HealthIndicatorsCard';
 import LifeHabitsCard from '../../components/dashboard/profil/LifeHabitsCard';
+import {  DEFAULT_PROFILE, PROFILE_STORAGE_KEY, type MedicalProfile } from '../../types/models/MedicalProfil';
+import { GenderEnum } from '../../types/models/enums/GenderEnum';
 
-export interface MedicalProfile {
-  age: string;
-  sexe: string;
-  poids: string;
-  taille: string;
-  tension: string;
-  cholesterol: string;
-  antecedents: string;
-  tabac: 'oui' | 'non';
-  alcool: 'reguliere' | 'occasionnelle' | 'jamais';
-  activite: string;
-}
-
-const PROFILE_STORAGE_KEY = 'diagnocare-medical-profile';
-
-const DEFAULT_PROFILE: MedicalProfile = {
-  age: '',
-  sexe: 'Homme',
-  poids: '',
-  taille: '',
-  tension: '',
-  cholesterol: '',
-  antecedents: '',
-  tabac: 'non',
-  alcool: 'jamais',
-  activite: 'Sédentaire (peu ou pas de sport)',
-};
 
 export default function ProfilMedicalPage() {
   const { t } = useTranslation();
+  const user = useUserStore((state) => state.user);
+
+  const { data: dbProfile, isLoading: isProfileLoading } = useProfile(user?.id);
+  const saveProfileMutation = useSaveProfile();
+
   const [profile, setProfile] = useState<MedicalProfile>(DEFAULT_PROFILE);
 
-  // Load from local storage
+  // Sync state when dbProfile is loaded/updated
   useEffect(() => {
     const saved = localStorage.getItem(PROFILE_STORAGE_KEY);
-    if (saved) {
-      try {
-        setProfile(JSON.parse(saved));
-      } catch (e) {
-        console.error('Error loading medical profile:', e);
-      }
-    }
-  }, []);
+    let currentProfile = saved ? JSON.parse(saved) : DEFAULT_PROFILE;
 
-  const handleSave = (e: React.FormEvent) => {
+    if (dbProfile) {
+      currentProfile = {
+        ...currentProfile,
+        age: dbProfile.age ? String(dbProfile.age) : currentProfile.age,
+        sexe: dbProfile.gender === 'FEMALE' ? 'Femme' : (dbProfile.gender === 'MALE' ? 'Homme' : currentProfile.sexe),
+        poids: dbProfile.weight ? String(dbProfile.weight) : currentProfile.poids,
+        taille: currentProfile.taille || (dbProfile.bmi && dbProfile.weight ? String(Math.round(Math.sqrt(dbProfile.weight / dbProfile.bmi) * 100)) : ''),
+        tension: dbProfile.meanBloodPressure ? String(Math.round(dbProfile.meanBloodPressure / 10)) : currentProfile.tension,
+        cholesterol: dbProfile.meanCholesterol ? (dbProfile.meanCholesterol / 100).toFixed(2) : currentProfile.cholesterol,
+        antecedents: dbProfile.familyAntecedents && dbProfile.familyAntecedents.length > 0 ? dbProfile.familyAntecedents.join(', ') : currentProfile.antecedents,
+        tabac: dbProfile.isSmoking !== undefined ? (dbProfile.isSmoking ? 'oui' : 'non') : currentProfile.tabac,
+        alcool: dbProfile.alcohol !== undefined ? (dbProfile.alcohol ? (currentProfile.alcool !== 'jamais' ? currentProfile.alcool : 'occasionnelle') : 'jamais') : currentProfile.alcool,
+        activite: dbProfile.sedentary !== undefined ? (dbProfile.sedentary ? 'Sédentaire (peu ou pas de sport)' : (currentProfile.activite !== 'Sédentaire (peu ou pas de sport)' ? currentProfile.activite : 'Actif (1-3 séances de sport/semaine)')) : currentProfile.activite,
+      };
+    }
+    setProfile(currentProfile);
+  }, [dbProfile]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.id) {
+      toast.error('User not authenticated');
+      return;
+    }
+
+    // Save to local storage for local detail retention (e.g. height, specific activity string)
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
-    toast.success(t('dashboard.pages.profil.save_success', 'Profil médical enregistré avec succès !'));
+
+    // Convert local MedicalProfile to PatientMedicalProfileRequestDTO
+    const age = parseInt(profile.age) || 0;
+    const gender = profile.sexe === 'Femme' ? GenderEnum.FEMALE : (profile.sexe === 'Homme' ? GenderEnum.MALE : null);
+    const weight = parseFloat(profile.poids) || 0;
+    const heightCm = parseFloat(profile.taille) || 0;
+
+    // Calculate BMI
+    const heightM = heightCm / 100;
+    const bmi = weight && heightM ? Math.round(weight / (heightM * heightM)) : 0;
+
+    // Parse blood pressure (systolic)
+    let meanBloodPressure = 0;
+    if (profile.tension) {
+      const parts = profile.tension.split('/');
+      const sys = parseFloat(parts[0]) || 0;
+      meanBloodPressure = sys <= 20 ? sys * 10 : sys;
+    }
+
+    // Parse cholesterol (g/L to mg/dL, or keeps mg/dL)
+    const rawChol = parseFloat(profile.cholesterol) || 0;
+    const meanCholesterol = rawChol > 10 ? rawChol : rawChol * 100;
+
+    const sedentary = profile.activite.includes('Sédentaire');
+    const isSmoking = profile.tabac === 'oui';
+    const alcohol = profile.alcool !== 'jamais';
+    const familyAntecedents = profile.antecedents
+      ? profile.antecedents.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+
+    const requestPayload = {
+      userId: user.id,
+      age,
+      gender,
+      weight,
+      meanBloodPressure: meanBloodPressure || undefined,
+      meanCholesterol: meanCholesterol || undefined,
+      sedentary,
+      bmi,
+      alcohol,
+      isSmoking,
+      familyAntecedents,
+    };
+
+    try {
+      await saveProfileMutation.mutateAsync(requestPayload);
+      toast.success(t('dashboard.pages.profil.save_success', 'Profil médical enregistré avec succès !'));
+    } catch (err) {
+      toast.error(t('dashboard.pages.profil.save_error', 'Erreur lors de l\'enregistrement du profil médical.'));
+    }
   };
 
   const updateField = (field: keyof MedicalProfile, value: string) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
+
+  if (isProfileLoading) {
+    return (
+      <div className="h-full flex items-center justify-center min-h-[400px] max-w-4xl mx-auto">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-primary dark:border-slate-800 dark:border-t-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div id="profil-page" className="space-y-6 max-w-4xl mx-auto pb-12 animate-fadeIn text-slate-800 dark:text-slate-100">
@@ -73,13 +129,14 @@ export default function ProfilMedicalPage() {
               {t('dashboard.pages.profil.description', 'Ces informations permettent d\'affiner la précision de nos prédictions.')}
             </p>
           </div>
-          
+
           <button
             type="submit"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-700 active:bg-primary-800 text-white font-bold px-5 py-3 rounded-xl shadow-md shadow-primary/25 hover:shadow-lg transition-all duration-200 cursor-pointer shrink-0"
+            disabled={saveProfileMutation.isPending}
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-700 active:bg-primary-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold px-5 py-3 rounded-xl shadow-md shadow-primary/25 hover:shadow-lg transition-all duration-200 cursor-pointer shrink-0"
           >
             <Save className="h-4.5 w-4.5" />
-            <span>{t('dashboard.pages.profil.save_btn', 'Enregistrer')}</span>
+            <span>{saveProfileMutation.isPending ? t('common.saving', 'Enregistrement...') : t('dashboard.pages.profil.save_btn', 'Enregistrer')}</span>
           </button>
         </div>
 

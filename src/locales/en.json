@@ -391,7 +391,20 @@
         "page_info": "Page {{current}} of {{total}}",
         "details_toast": "Displaying details of the prediction: {{title}}",
         "card_title": "No evaluations recorded",
-        "card_desc": "Your history is currently empty. Complete your first evaluation to save it here."
+        "card_desc": "Your history is currently empty. Complete your first evaluation to save it here.",
+        "delete_success": "Evaluation deleted successfully.",
+        "delete_error": "An error occurred during deletion.",
+        "clear_success": "History cleared successfully.",
+        "clear_error": "An error occurred during deletion.",
+        "clear_all_desc": "Clear all history",
+        "clear_all": "Clear History",
+        "details_modal_title": "Evaluation Details",
+        "details_modal_date": "Performed on {{date}}",
+        "clear_confirm_title": "Confirm Deletion",
+        "clear_confirm_desc": "This action is irreversible and will delete all your prediction history.",
+        "clear_confirm_type_code": "Please enter the confirmation code:",
+        "delete_confirm_title": "Delete this evaluation?",
+        "delete_confirm_desc": "This evaluation will be deleted from your history. This action is irreversible."
       },
       "resume": {
         "title": "Medical Summary",

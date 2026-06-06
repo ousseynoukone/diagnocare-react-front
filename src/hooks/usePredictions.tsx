@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { 
   getPredictionsByUserId, 
   getDetailedPredictionsByUser,
@@ -17,9 +18,11 @@ export const usePredictions = (userId: number | undefined) => {
 };
 
 export const useDetailedPredictions = (userId: number | undefined) => {
+  const { i18n } = useTranslation();
+  const lang = i18n.language ? i18n.language.split('-')[0] : 'fr';
   return useQuery({
-    queryKey: ['predictions-detailed', userId],
-    queryFn: () => getDetailedPredictionsByUser(userId!),
+    queryKey: ['predictions-detailed', userId, lang],
+    queryFn: () => getDetailedPredictionsByUser(userId!, lang),
     enabled: !!userId,
   });
 };

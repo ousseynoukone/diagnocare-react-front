@@ -127,7 +127,7 @@ export default function ResetPasswordPage() {
                                 type="email"
                                 placeholder={t('auth.reset_password.email_placeholder')}
                                 disabled={step === 2 || isRequesting || isConfirming}
-                                className={`w-full rounded-lg border pl-10 pr-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                className={`w-full rounded-lg border pl-10 pr-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 transition-all duration-150 disabled:opacity-60 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                 {...register("email", {
                                     required: "L'adresse email est requise.",
                                     pattern: {
@@ -178,7 +178,7 @@ export default function ResetPasswordPage() {
                                         maxLength={6}
                                         autoComplete="one-time-code"
                                         disabled={isConfirming || isRequesting}
-                                        className={`w-full rounded-lg border pl-10 pr-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.code ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                        className={`w-full rounded-lg border pl-10 pr-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.code ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                         {...register("code", {
                                             required: "Le code est requis.",
                                             pattern: {
@@ -209,7 +209,7 @@ export default function ResetPasswordPage() {
                                         type="password"
                                         placeholder={t('auth.reset_password.new_password_placeholder')}
                                         disabled={isConfirming || isRequesting}
-                                        className={`w-full rounded-lg border pl-10 pr-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.newPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                        className={`w-full rounded-lg border pl-10 pr-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.newPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                         {...register("newPassword", {
                                             required: "Le nouveau mot de passe est requis.",
                                             minLength: {
@@ -240,7 +240,7 @@ export default function ResetPasswordPage() {
                                         type="password"
                                         placeholder={t('auth.reset_password.confirm_password_placeholder')}
                                         disabled={isConfirming || isRequesting}
-                                        className={`w-full rounded-lg border pl-10 pr-3.5 py-2 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
+                                        className={`w-full rounded-lg border pl-10 pr-4.5 py-3 text-sm placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 transition-all duration-150 disabled:opacity-60 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-200' : 'border-slate-200'}`}
                                         {...register("confirmPassword", {
                                             required: "Veuillez confirmer le nouveau mot de passe."
                                         })}

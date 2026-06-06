@@ -3,7 +3,7 @@ import {
   getProfileByUserId, 
   createOrUpdateProfileRequest
 } from '../api-s/requests/ProfileRequest';
-import type { PatientMedicalProfileRequest } from '../api-s/requests/ProfileRequest';
+import type { PatientMedicalProfileRequest } from '../types/models/MedicalProfil';
 
 export const useProfile = (userId: number | undefined) => {
   return useQuery({

@@ -1,15 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe, ChevronDown } from "lucide-react";
+import { useUserStore } from "../../store/UserStore";
 
 export default function SwitchLanguage() {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const changeLanguage = (lang: string) => {
+  const changeLanguage = async (lang: string) => {
     i18n.changeLanguage(lang);
     setIsOpen(false);
+    
+    // Update language in the database if user is logged in
+    const user = useUserStore.getState().user;
+    if (user?.id) {
+      try {
+        await useUserStore.getState().updateUser({ lang });
+      } catch (err) {
+        console.error("Failed to update user language in backend:", err);
+      }
+    }
   };
 
   // Close dropdown on click outside

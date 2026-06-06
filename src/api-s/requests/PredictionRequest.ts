@@ -1,5 +1,6 @@
 import type { CreatePredictionRequest, HydratedPrediction, PredictionDTO, PredictionWithResultsResponse } from '../../types/models/Prediction';
 import { apiClient } from '../AxiosApiClient';
+import { translateDisease, translateSpecialist } from '../../utils/translationHelper';
 
 
 
@@ -39,7 +40,7 @@ function isCurrentMonth(dateStr: string): boolean {
 }
 
 // Fetch and hydrate all predictions for a specific user to match local HistoryRecord shape
-export async function getDetailedPredictionsByUser(userId: number): Promise<HydratedPrediction[]> {
+export async function getDetailedPredictionsByUser(userId: number, lang: string = 'fr'): Promise<HydratedPrediction[]> {
   const predictions = await getPredictionsByUserId(userId);
   if (!predictions || predictions.length === 0) return [];
 
@@ -75,8 +76,9 @@ export async function getDetailedPredictionsByUser(userId: number): Promise<Hydr
               if (score <= 1.0) {
                 score = score * 100;
               }
+              const rawName = alt.localizedDiseaseName || alt.pathologyName;
               return {
-                name: alt.localizedDiseaseName || alt.pathologyName,
+                name: translateDisease(rawName, lang),
                 score: Math.round(score)
               };
             })
@@ -88,20 +90,25 @@ export async function getDetailedPredictionsByUser(userId: number): Promise<Hydr
               if (score <= 1.0) {
                 score = score * 100;
               }
+              const rawTitle = alt.localizedDiseaseName || alt.pathologyName;
+              const rawSpecialist = alt.localizedSpecialistLabel || alt.doctorSpecialistLabel || 'Généraliste';
               return {
-                title: alt.localizedDiseaseName || alt.pathologyName,
+                title: translateDisease(rawTitle, lang),
                 description: alt.description || '',
                 confidence: Math.round(score),
-                specialist: alt.localizedSpecialistLabel || alt.doctorSpecialistLabel || 'Généraliste',
+                specialist: translateSpecialist(rawSpecialist, lang),
                 isPrimary: index === 0
               };
             })
           : [];
 
+        const rawTitle = bestPathology ? (bestPathology.localizedDiseaseName || bestPathology.pathologyName) : (pred.comment || 'Analyse de symptômes');
+        const rawSpecialist = bestPathology ? (bestPathology.localizedSpecialistLabel || bestPathology.doctorSpecialistLabel) : 'Généraliste';
+
         return {
           id: String(pred.id),
-          title: bestPathology ? (bestPathology.localizedDiseaseName || bestPathology.pathologyName) : (pred.comment || 'Analyse de symptômes'),
-          specialist: bestPathology ? (bestPathology.localizedSpecialistLabel || bestPathology.doctorSpecialistLabel) : 'Généraliste',
+          title: translateDisease(rawTitle, lang),
+          specialist: translateSpecialist(rawSpecialist, lang),
           date: formatDate(pred.createdAt),
           confidence: scorePct,
           alert: pred.isRedAlert,

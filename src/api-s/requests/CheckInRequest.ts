@@ -1,4 +1,5 @@
 import { apiClient } from '../AxiosApiClient';
+import { translateDisease } from '../../utils/translationHelper';
 
 export interface CheckInCreateRequest {
   userId: number;
@@ -58,7 +59,7 @@ function formatDateTime(dateStr: string): string {
 }
 
 // Fetch and hydrate all check-ins for a specific user to match local FollowUpData shape
-export async function getDetailedCheckInsByUser(userId: number): Promise<FollowUpData[]> {
+export async function getDetailedCheckInsByUser(userId: number, lang: string = 'fr'): Promise<FollowUpData[]> {
   const checkIns = await getCheckInsByUserId(userId);
   if (!checkIns || checkIns.length === 0) return [];
 
@@ -72,14 +73,19 @@ export async function getDetailedCheckInsByUser(userId: number): Promise<FollowU
           ? pathologyResults[0]
           : null;
 
-        const title = bestPathology ? bestPathology.pathologyName : 'Suivi de symptômes';
+        const title = bestPathology 
+          ? translateDisease(bestPathology.localizedDiseaseName || bestPathology.pathologyName, lang)
+          : (lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up');
         const isCompleted = ci.status === 'COMPLETED';
+        const statusLabel = isCompleted 
+          ? (lang === 'fr' ? 'Terminé' : 'Completed') 
+          : (lang === 'fr' ? 'À faire' : 'To do');
 
         return {
           id: String(ci.id),
           title,
           status: isCompleted ? ('completed' as const) : ('pending' as const),
-          statusLabel: isCompleted ? 'Terminé' : 'À faire',
+          statusLabel,
           time: ci.completedAt 
             ? formatDateTime(ci.completedAt) 
             : (ci.firstReminderAt ? formatDateTime(ci.firstReminderAt) : "Aujourd'hui, 18:00"),
@@ -89,11 +95,14 @@ export async function getDetailedCheckInsByUser(userId: number): Promise<FollowU
       } catch (err) {
         console.error(`Failed to hydrate check-in ${ci.id}:`, err);
         const isCompleted = ci.status === 'COMPLETED';
+        const statusLabel = isCompleted 
+          ? (lang === 'fr' ? 'Terminé' : 'Completed') 
+          : (lang === 'fr' ? 'À faire' : 'To do');
         return {
           id: String(ci.id),
-          title: 'Suivi de symptômes',
+          title: lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up',
           status: isCompleted ? ('completed' as const) : ('pending' as const),
-          statusLabel: isCompleted ? 'Terminé' : 'À faire',
+          statusLabel,
           time: "Aujourd'hui, 18:00",
           day: 'J+1',
           rawCheckIn: ci,
