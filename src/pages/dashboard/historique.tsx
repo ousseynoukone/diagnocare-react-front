@@ -566,21 +566,52 @@ export default function HistoriquePage() {
                         </p>
                       </div>
                       
-                      <div className="bg-slate-800 border border-slate-700 p-4 rounded-xl text-center space-y-1 shadow-inner">
-                        <span className="text-lg font-extrabold text-white block">
-                          {activePoss.specialist}
-                        </span>
-                      </div>
+                      {(() => {
+                        const isLowConfidence = activePoss.confidence < 50;
+                        const generalistLabel = i18n.language.startsWith('fr') ? 'Médecin Généraliste' : 'General Practitioner';
+                        const recommendedSpecialist = isLowConfidence ? generalistLabel : activePoss.specialist;
 
-                      <a
-                        href={`https://www.doctolib.fr/recherche?query=${encodeURIComponent(activePoss.specialist)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-100 text-slate-900 font-bold px-4 py-3 rounded-xl transition-colors shadow-sm cursor-pointer text-xs"
-                      >
-                        <MapPin className="h-4 w-4 fill-slate-950" />
-                        <span>{t('dashboard.pages.evaluation.result_find_nearby', 'Trouver à proximité')}</span>
-                      </a>
+                        return (
+                          <>
+                            <div className="bg-slate-800 border border-slate-700 p-4 rounded-xl text-center space-y-1 shadow-inner">
+                              <span className="text-lg font-extrabold text-white block">
+                                {recommendedSpecialist}
+                              </span>
+                              {isLowConfidence ? (
+                                <span className="text-[10px] text-slate-400 font-semibold block leading-relaxed mt-2">
+                                  {i18n.language.startsWith('fr')
+                                    ? `Suggéré par l'IA : ${activePoss.specialist} (Indice : ${activePoss.specialistConfidence ?? 0}%)`
+                                    : `Suggested by AI: ${activePoss.specialist} (Index: ${activePoss.specialistConfidence ?? 0}%)`
+                                  }
+                                  <br />
+                                  <span className="text-[9px] text-amber-400 font-bold tracking-wide uppercase">
+                                    {i18n.language.startsWith('fr')
+                                      ? "(Recommandé en premier recours car la confiance est < 50%)"
+                                      : "(Recommended as first line because confidence is < 50%)"
+                                    }
+                                  </span>
+                                </span>
+                              ) : (
+                                activePoss.specialistConfidence !== undefined && activePoss.specialistConfidence > 0 && (
+                                  <span className="text-xs text-slate-400 font-semibold block">
+                                    {t('dashboard.pages.evaluation.specialist_confidence', { confidence: activePoss.specialistConfidence, defaultValue: 'Indice de recommandation : {{confidence}}%' })}
+                                  </span>
+                                )
+                              )}
+                            </div>
+
+                            <a
+                              href={`https://www.doctolib.fr/recherche?query=${encodeURIComponent(recommendedSpecialist)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full flex items-center justify-center gap-2 bg-white hover:bg-slate-100 text-slate-900 font-bold px-4 py-3 rounded-xl transition-colors shadow-sm cursor-pointer text-xs"
+                            >
+                              <MapPin className="h-4 w-4 fill-slate-950" />
+                              <span>{t('dashboard.pages.evaluation.result_find_nearby', 'Trouver à proximité')}</span>
+                            </a>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>

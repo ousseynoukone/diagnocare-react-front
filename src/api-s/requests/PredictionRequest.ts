@@ -64,18 +64,11 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
           : '';
 
         // Scale bestScore from decimal (e.g. 0.88) to percentage (88)
-        let scorePct = pred.bestScore;
-        if (scorePct <= 1.0) {
-          scorePct = scorePct * 100;
-        }
-        scorePct = Math.round(scorePct);
+        const scorePct = Math.round(pred.bestScore);
 
         const alternativesList = Array.isArray(pathologyResults) && pathologyResults.length > 1
           ? pathologyResults.slice(1).map((alt: any) => {
-              let score = alt.diseaseScore;
-              if (score <= 1.0) {
-                score = score * 100;
-              }
+              const score = alt.diseaseScore;
               const rawName = alt.localizedDiseaseName || alt.pathologyName;
               return {
                 name: translateDisease(rawName, lang),
@@ -86,10 +79,7 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
 
         const allPossibilitiesList = Array.isArray(pathologyResults)
           ? pathologyResults.map((alt: any, index: number) => {
-              let score = alt.diseaseScore;
-              if (score <= 1.0) {
-                score = score * 100;
-              }
+              const score = alt.diseaseScore;
               const rawTitle = alt.localizedDiseaseName || alt.pathologyName;
               const rawSpecialist = alt.localizedSpecialistLabel || alt.doctorSpecialistLabel || 'Généraliste';
               return {
@@ -97,6 +87,7 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
                 description: alt.description || '',
                 confidence: Math.round(score),
                 specialist: translateSpecialist(rawSpecialist, lang),
+                specialistConfidence: alt.specialistScore !== undefined ? Math.round(alt.specialistScore) : 0,
                 isPrimary: index === 0
               };
             })
@@ -109,6 +100,7 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
           id: String(pred.id),
           title: translateDisease(rawTitle, lang),
           specialist: translateSpecialist(rawSpecialist, lang),
+          specialistConfidence: bestPathology && bestPathology.specialistScore !== undefined ? Math.round(bestPathology.specialistScore) : 0,
           date: formatDate(pred.createdAt),
           confidence: scorePct,
           alert: pred.isRedAlert,
@@ -123,11 +115,7 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
       } catch (err) {
         console.error(`Failed to hydrate prediction ${pred.id}:`, err);
         // Safe fallback in case of errors
-        let scorePct = pred.bestScore;
-        if (scorePct <= 1.0) {
-          scorePct = scorePct * 100;
-        }
-        scorePct = Math.round(scorePct);
+        const scorePct = Math.round(pred.bestScore);
 
         return {
           id: String(pred.id),

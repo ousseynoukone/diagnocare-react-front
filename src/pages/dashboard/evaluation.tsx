@@ -83,24 +83,11 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
   
   const description = primary.description || '';
   
-  let confidence = primary.probability ?? 80;
-  if (confidence <= 1.0) {
-    confidence = confidence * 100;
-  }
-  confidence = Math.round(confidence);
-
-  let specialistConfidence = primary.specialist_probability ?? 0;
-  if (specialistConfidence > 0 && specialistConfidence <= 1.0) {
-    specialistConfidence = specialistConfidence * 100;
-  }
-  specialistConfidence = Math.round(specialistConfidence);
+  const confidence = Math.round(primary.probability ?? 80);
+  const specialistConfidence = Math.round(primary.specialist_probability ?? 0);
 
   const alternatives = predictions.slice(1).map((alt: any) => {
-    let score = alt.probability ?? 50;
-    if (score <= 1.0) {
-      score = score * 100;
-    }
-    score = Math.round(score);
+    const score = Math.round(alt.probability ?? 50);
     const rawName = isFr ? (alt.disease_fr || alt.disease) : (alt.disease_en || alt.disease);
     return {
       name: translateDisease(rawName, lang),
@@ -115,17 +102,8 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
     const pSpecialist = translateSpecialist(rawPSpecialist, lang);
     const pDescription = pred.description || '';
     
-    let pConfidence = pred.probability ?? 80;
-    if (pConfidence <= 1.0) {
-      pConfidence = pConfidence * 100;
-    }
-    pConfidence = Math.round(pConfidence);
-
-    let pSpecialistConfidence = pred.specialist_probability ?? 0;
-    if (pSpecialistConfidence > 0 && pSpecialistConfidence <= 1.0) {
-      pSpecialistConfidence = pSpecialistConfidence * 100;
-    }
-    pSpecialistConfidence = Math.round(pSpecialistConfidence);
+    const pConfidence = Math.round(pred.probability ?? 80);
+    const pSpecialistConfidence = Math.round(pred.specialist_probability ?? 0);
 
     return {
       title: pTitle,

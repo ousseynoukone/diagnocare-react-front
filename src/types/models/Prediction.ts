@@ -25,6 +25,7 @@ export interface HydratedPrediction {
   id: string;
   title: string;
   specialist: string;
+  specialistConfidence?: number;
   date: string;
   confidence: number;
   alert: boolean;

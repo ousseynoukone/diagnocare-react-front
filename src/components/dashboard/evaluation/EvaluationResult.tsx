@@ -40,7 +40,7 @@ export default function EvaluationResult({
   onBackToSelection,
   onFindSpecialists,
 }: EvaluationResultProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useUserStore((state) => state.user);
   const createReportMutation = useCreateReport();
 
@@ -276,29 +276,55 @@ export default function EvaluationResult({
             </div>
             
             {/* Doctor badge box */}
-            <div className="bg-background-800 border border-background-700 p-5 rounded-xl text-center shadow-inner space-y-1">
-              <span className="text-xl font-extrabold tracking-tight text-white block">
-                {activePossibility.specialist}
-              </span>
-              {activePossibility.specialistConfidence !== undefined && activePossibility.specialistConfidence > 0 && (
-                <span className="text-xs text-background-400 font-semibold block">
-                  {t('dashboard.pages.evaluation.specialist_confidence', { confidence: activePossibility.specialistConfidence, defaultValue: 'Indice de recommandation : {{confidence}}%' })}
-                </span>
-              )}
-            </div>
+            {(() => {
+              const isLowConfidence = activePossibility.confidence < 50;
+              const generalistLabel = i18n.language.startsWith('fr') ? 'Médecin Généraliste' : 'General Practitioner';
+              const recommendedSpecialist = isLowConfidence ? generalistLabel : activePossibility.specialist;
 
-            <div className="space-y-4 pt-6">
-              <button
-                onClick={() => onFindSpecialists(activePossibility.specialist)}
-                className="w-full flex items-center justify-center gap-2 bg-white hover:bg-background-100 text-background-900 font-bold px-6 py-3.5 rounded-xl transition-all duration-200 shadow-lg cursor-pointer"
-              >
-                <MapPin className="h-4 w-4 fill-background-950" />
-                {t('dashboard.pages.evaluation.result_find_nearby', 'Trouver à proximité')}
-              </button>
-              <p className="text-center text-[10px] text-background-500 font-semibold tracking-wide">
-                {t('dashboard.pages.evaluation.result_redirection_sub', 'Redirection vers Doctolib / Google Maps')}
-              </p>
-            </div>
+              return (
+                <>
+                  <div className="bg-background-800 border border-background-700 p-5 rounded-xl text-center shadow-inner space-y-1">
+                    <span className="text-xl font-extrabold tracking-tight text-white block animate-fadeIn">
+                      {recommendedSpecialist}
+                    </span>
+                    {isLowConfidence ? (
+                      <span className="text-xs text-background-400 font-semibold block leading-relaxed mt-2 animate-fadeIn">
+                        {i18n.language.startsWith('fr')
+                          ? `Suggéré par l'IA : ${activePossibility.specialist} (Indice : ${activePossibility.specialistConfidence ?? 0}%)`
+                          : `Suggested by AI: ${activePossibility.specialist} (Index: ${activePossibility.specialistConfidence ?? 0}%)`
+                        }
+                        <br />
+                        <span className="text-[10px] text-amber-400 font-bold tracking-wide uppercase">
+                          {i18n.language.startsWith('fr')
+                            ? "(Recommandé en premier recours car la confiance est < 50%)"
+                            : "(Recommended as first line because confidence is < 50%)"
+                          }
+                        </span>
+                      </span>
+                    ) : (
+                      activePossibility.specialistConfidence !== undefined && activePossibility.specialistConfidence > 0 && (
+                        <span className="text-xs text-background-400 font-semibold block animate-fadeIn">
+                          {t('dashboard.pages.evaluation.specialist_confidence', { confidence: activePossibility.specialistConfidence, defaultValue: 'Indice de recommandation : {{confidence}}%' })}
+                        </span>
+                      )
+                    )}
+                  </div>
+
+                  <div className="space-y-4 pt-6">
+                    <button
+                      onClick={() => onFindSpecialists(recommendedSpecialist)}
+                      className="w-full flex items-center justify-center gap-2 bg-white hover:bg-background-100 text-background-900 font-bold px-6 py-3.5 rounded-xl transition-all duration-200 shadow-lg cursor-pointer"
+                    >
+                      <MapPin className="h-4 w-4 fill-background-950" />
+                      {t('dashboard.pages.evaluation.result_find_nearby', 'Trouver à proximité')}
+                    </button>
+                    <p className="text-center text-[10px] text-background-500 font-semibold tracking-wide">
+                      {t('dashboard.pages.evaluation.result_redirection_sub', 'Redirection vers Doctolib / Google Maps')}
+                    </p>
+                  </div>
+                </>
+              );
+            })()}
           </div>
 
           {/* Declared Symptoms Card */}
