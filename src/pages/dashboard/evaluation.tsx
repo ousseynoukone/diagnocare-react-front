@@ -244,17 +244,24 @@ export default function EvaluationPage() {
     }
   };
 
-  // If page reloads and state is RESULT/LOADING but resultData is null, reset to SELECTION.
-  // SEARCH_SPECIALIST is excluded: it's valid without resultData (navigation from historique).
+  // Guard against stale Zustand state on hard reload (e.g. LOADING with no resultData)
   useEffect(() => {
     const isStaleState =
       evaluationState !== EvaluationState.START &&
-      evaluationState !== EvaluationState.SELECTION &&
-      evaluationState !== EvaluationState.SEARCH_SPECIALIST;
+      evaluationState !== EvaluationState.SELECTION;
     if (isStaleState && !resultData) {
-      setEvaluationState(EvaluationState.SELECTION);
+      setEvaluationState(EvaluationState.START);
     }
-  }, [evaluationState, resultData]);
+  }, [evaluationState, resultData, setEvaluationState]);
+
+  // Reset state to START when leaving the page so navigating back always starts fresh.
+  // resultData is already local (lost on unmount), so resetting the store is consistent.
+  useEffect(() => {
+    return () => {
+      setEvaluationState(EvaluationState.START);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle navigation from historique: { openSpecialistFinder: true, specialist: '...' }
   useEffect(() => {

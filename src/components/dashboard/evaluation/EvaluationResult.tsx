@@ -27,6 +27,7 @@ export default function EvaluationResult({
 
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [suiviActivated, setSuiviActivated] = useState(false);
+  const [suiviDismissed, setSuiviDismissed] = useState(false);
   const [suiviSchedule, setSuiviSchedule] = useState<{ first: string; second: string } | null>(null);
 
   const handleActivateSuivi = async () => {
@@ -216,6 +217,85 @@ export default function EvaluationResult({
 
         {/* Right Column: Specialist & Medical Profile used */}
         <div className="space-y-6">
+
+          {/* ── Health Follow-up CTA ─────────────────────────────── */}
+          {resultData.id && !suiviDismissed && (
+            <div className={`rounded-2xl overflow-hidden shadow-sm transition-all ${
+              suiviActivated
+                ? 'bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40'
+                : 'bg-gradient-to-br from-blue-600 to-indigo-700'
+            }`}>
+              <div className="p-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-xl shrink-0 ${suiviActivated ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-white/20'}`}>
+                    {suiviActivated
+                      ? <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      : <Bell className="h-5 w-5 text-white" />
+                    }
+                  </div>
+                  <div>
+                    <h3 className={`text-sm font-bold ${suiviActivated ? 'text-emerald-800 dark:text-emerald-300' : 'text-white'}`}>
+                      {suiviActivated
+                        ? t('dashboard.pages.evaluation.suivi_activated_title', 'Suivi santé activé')
+                        : t('dashboard.pages.evaluation.suivi_title', 'Activer le suivi santé')}
+                    </h3>
+                    {!suiviActivated && (
+                      <p className="text-xs text-white/75 font-medium mt-0.5">
+                        {t('dashboard.pages.evaluation.suivi_cta_sub', 'Rappels email à J+1 et J+2')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {suiviActivated && suiviSchedule ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                      {i18n.language.startsWith('fr') ? 'Rappels email programmés :' : 'Scheduled email reminders:'}
+                    </p>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between bg-white dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 rounded-xl">
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">J+1</span>
+                        <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{suiviSchedule.first}</span>
+                      </div>
+                      <div className="flex items-center justify-between bg-white dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 rounded-xl">
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">J+2</span>
+                        <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{suiviSchedule.second}</span>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium">
+                      {i18n.language.startsWith('fr')
+                        ? 'Retrouvez ce suivi dans "Suivi de santé".'
+                        : 'Find this in the "Health Follow-up" section.'}
+                    </p>
+                  </div>
+                ) : !suiviActivated && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-4 text-xs text-white/80 font-semibold">
+                      <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> J+1 : 24h</span>
+                      <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> J+2 : 48h</span>
+                    </div>
+                    <button
+                      onClick={handleActivateSuivi}
+                      disabled={activateCheckInMutation.isPending}
+                      className="w-full flex items-center justify-center gap-2 bg-white hover:bg-blue-50 disabled:opacity-60 disabled:cursor-not-allowed text-blue-700 font-bold px-4 py-2.5 rounded-xl text-sm shadow-md transition-all cursor-pointer"
+                    >
+                      <Bell className="h-4 w-4" />
+                      {activateCheckInMutation.isPending
+                        ? t('common.loading', 'Activation...')
+                        : t('dashboard.pages.evaluation.suivi_activate_btn', 'Activer le suivi')}
+                    </button>
+                    <button
+                      onClick={() => setSuiviDismissed(true)}
+                      className="w-full text-xs font-semibold text-white/60 hover:text-white/90 transition-colors cursor-pointer"
+                    >
+                      {t('dashboard.pages.evaluation.suivi_skip', 'Non merci')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Recommended Specialist Card */}
           <div className="bg-background-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-background-800 space-y-6">
             <div className="space-y-1">
@@ -386,94 +466,6 @@ export default function EvaluationResult({
           </p>
         </div>
       </div>
-
-      {/* Health Follow-up Activation */}
-      {resultData.id && (
-        <div className={`border rounded-2xl p-6 space-y-4 transition-all ${
-          suiviActivated
-            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40'
-            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'
-        }`}>
-          <div className="flex items-start gap-4">
-            <div className={`p-2.5 rounded-xl shrink-0 ${suiviActivated ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-blue-50 dark:bg-blue-950/30'}`}>
-              {suiviActivated ? (
-                <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-              ) : (
-                <Bell className="h-6 w-6 text-blue-500 dark:text-blue-400" />
-              )}
-            </div>
-            <div className="space-y-1 flex-1">
-              <h3 className={`text-base font-bold ${suiviActivated ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-900 dark:text-white'}`}>
-                {suiviActivated
-                  ? t('dashboard.pages.evaluation.suivi_activated_title', 'Suivi santé activé')
-                  : t('dashboard.pages.evaluation.suivi_title', 'Activer le suivi santé')}
-              </h3>
-              {suiviActivated && suiviSchedule ? (
-                <div className="space-y-2 pt-1">
-                  <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
-                    {i18n.language.startsWith('fr')
-                      ? 'Vous recevrez des rappels par email pour réévaluer vos symptômes :'
-                      : 'You will receive email reminders to re-evaluate your symptoms:'}
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center gap-2 bg-white dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 rounded-xl">
-                      <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                      <div>
-                        <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">J+1</p>
-                        <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{suiviSchedule.first}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 rounded-xl">
-                      <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                      <div>
-                        <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">J+2</p>
-                        <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{suiviSchedule.second}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium">
-                    {i18n.language.startsWith('fr')
-                      ? 'Retrouvez ce suivi dans la section "Suivi de santé" de votre tableau de bord.'
-                      : 'Find this follow-up in the "Health Follow-up" section of your dashboard.'}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                  {t('dashboard.pages.evaluation.suivi_desc',
-                    'Notre IA surveillera l\'évolution de vos symptômes. Vous recevrez un rappel email à J+1 (24h) et J+2 (48h) pour réévaluer votre état de santé.')}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {!suiviActivated && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 font-semibold flex-wrap">
-                <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> J+1 : 24h</span>
-                <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> J+2 : 48h</span>
-              </div>
-              <div className="flex items-center gap-3 sm:ml-auto">
-                <button
-                  onClick={handleActivateSuivi}
-                  disabled={activateCheckInMutation.isPending}
-                  className="flex items-center gap-2 bg-primary hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md shadow-primary/20 transition-all cursor-pointer"
-                >
-                  <Bell className="h-4 w-4" />
-                  {activateCheckInMutation.isPending
-                    ? t('common.loading', 'Activation...')
-                    : t('dashboard.pages.evaluation.suivi_activate_btn', 'Activer le suivi')}
-                </button>
-                <button
-                  onClick={() => setSuiviActivated(true)}
-                  className="text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
-                >
-                  {t('dashboard.pages.evaluation.suivi_skip', 'Non merci')}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       <ReportModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} predId={resultData.id ?? null} />
     </div>
