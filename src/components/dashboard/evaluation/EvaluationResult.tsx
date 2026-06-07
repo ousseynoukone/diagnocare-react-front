@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Download, CheckCircle, MapPin, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle, MapPin, AlertTriangle, Bell, Clock, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import type { PredictionResult, DiagnosisPossibility } from '../../../types/models/Evaluation';
 import { getConfidenceStyles } from '../../../utils/confidenceStyles';
 import { useDownloadPDF } from '../../../hooks/useDownloadPDF';
+import { useActivateCheckIn } from '../../../hooks/useCheckIns';
+import { useUserStore } from '../../../store/UserStore';
 import ReportModal from '../../shared/ReportModal';
 
 interface EvaluationResultProps {
@@ -19,8 +22,34 @@ export default function EvaluationResult({
 }: EvaluationResultProps) {
   const { t, i18n } = useTranslation();
   const { downloadPDF } = useDownloadPDF();
+  const user = useUserStore((s) => s.user);
+  const activateCheckInMutation = useActivateCheckIn();
 
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [suiviActivated, setSuiviActivated] = useState(false);
+  const [suiviSchedule, setSuiviSchedule] = useState<{ first: string; second: string } | null>(null);
+
+  const handleActivateSuivi = async () => {
+    if (!resultData.id || !user?.id) return;
+    const isFr = i18n.language.startsWith('fr');
+    try {
+      const result = await activateCheckInMutation.mutateAsync({ predictionId: resultData.id, userId: user.id });
+      const fmt = (d: string | null) => {
+        if (!d) return '';
+        const obj = new Date(d);
+        const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'];
+        return `${obj.getDate()} ${months[obj.getMonth()]}, ${String(obj.getHours()).padStart(2, '0')}:${String(obj.getMinutes()).padStart(2, '0')}`;
+      };
+      setSuiviSchedule({
+        first: fmt(result.firstReminderAt),
+        second: fmt(result.secondReminderAt),
+      });
+      setSuiviActivated(true);
+      toast.success(isFr ? 'Suivi santé activé ! Vous recevrez des rappels par email.' : 'Health follow-up activated! You will receive email reminders.');
+    } catch {
+      toast.error(isFr ? 'Impossible d\'activer le suivi.' : 'Unable to activate follow-up.');
+    }
+  };
 
   const allPossibilities = resultData.allPossibilities || [
     {
@@ -357,6 +386,94 @@ export default function EvaluationResult({
           </p>
         </div>
       </div>
+
+      {/* Health Follow-up Activation */}
+      {resultData.id && (
+        <div className={`border rounded-2xl p-6 space-y-4 transition-all ${
+          suiviActivated
+            ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40'
+            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'
+        }`}>
+          <div className="flex items-start gap-4">
+            <div className={`p-2.5 rounded-xl shrink-0 ${suiviActivated ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-blue-50 dark:bg-blue-950/30'}`}>
+              {suiviActivated ? (
+                <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Bell className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+              )}
+            </div>
+            <div className="space-y-1 flex-1">
+              <h3 className={`text-base font-bold ${suiviActivated ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-900 dark:text-white'}`}>
+                {suiviActivated
+                  ? t('dashboard.pages.evaluation.suivi_activated_title', 'Suivi santé activé')
+                  : t('dashboard.pages.evaluation.suivi_title', 'Activer le suivi santé')}
+              </h3>
+              {suiviActivated && suiviSchedule ? (
+                <div className="space-y-2 pt-1">
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
+                    {i18n.language.startsWith('fr')
+                      ? 'Vous recevrez des rappels par email pour réévaluer vos symptômes :'
+                      : 'You will receive email reminders to re-evaluate your symptoms:'}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center gap-2 bg-white dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 rounded-xl">
+                      <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">J+1</p>
+                        <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{suiviSchedule.first}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 rounded-xl">
+                      <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">J+2</p>
+                        <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">{suiviSchedule.second}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium">
+                    {i18n.language.startsWith('fr')
+                      ? 'Retrouvez ce suivi dans la section "Suivi de santé" de votre tableau de bord.'
+                      : 'Find this follow-up in the "Health Follow-up" section of your dashboard.'}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                  {t('dashboard.pages.evaluation.suivi_desc',
+                    'Notre IA surveillera l\'évolution de vos symptômes. Vous recevrez un rappel email à J+1 (24h) et J+2 (48h) pour réévaluer votre état de santé.')}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {!suiviActivated && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 font-semibold flex-wrap">
+                <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> J+1 : 24h</span>
+                <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> J+2 : 48h</span>
+              </div>
+              <div className="flex items-center gap-3 sm:ml-auto">
+                <button
+                  onClick={handleActivateSuivi}
+                  disabled={activateCheckInMutation.isPending}
+                  className="flex items-center gap-2 bg-primary hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md shadow-primary/20 transition-all cursor-pointer"
+                >
+                  <Bell className="h-4 w-4" />
+                  {activateCheckInMutation.isPending
+                    ? t('common.loading', 'Activation...')
+                    : t('dashboard.pages.evaluation.suivi_activate_btn', 'Activer le suivi')}
+                </button>
+                <button
+                  onClick={() => setSuiviActivated(true)}
+                  className="text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                >
+                  {t('dashboard.pages.evaluation.suivi_skip', 'Non merci')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <ReportModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} predId={resultData.id ?? null} />
     </div>

@@ -1,11 +1,12 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { 
-  getCheckInsByUserId, 
+import {
+  getCheckInsByUserId,
   getDetailedCheckInsByUser,
-  submitCheckInRequest
+  activateCheckInRequest,
+  submitCheckInRequest,
 } from '../api-s/requests/CheckInRequest';
-import type { CheckInCreateRequest } from '../api-s/requests/CheckInRequest';
+import type { CheckInActivateRequest, CheckInCreateRequest } from '../api-s/requests/CheckInRequest';
 
 export const useCheckIns = (userId: number | undefined) => {
   return useQuery({
@@ -25,8 +26,24 @@ export const useDetailedCheckIns = (userId: number | undefined) => {
   });
 };
 
+export const useActivateCheckIn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: CheckInActivateRequest) => activateCheckInRequest(request),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['check-ins', variables.userId] });
+      queryClient.invalidateQueries({ queryKey: ['check-ins-detailed', variables.userId] });
+    },
+  });
+};
+
 export const useSubmitCheckIn = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (request: CheckInCreateRequest) => submitCheckInRequest(request),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['check-ins', variables.userId] });
+      queryClient.invalidateQueries({ queryKey: ['check-ins-detailed', variables.userId] });
+    },
   });
 };

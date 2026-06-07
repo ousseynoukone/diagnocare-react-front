@@ -1,6 +1,11 @@
 import { apiClient } from '../AxiosApiClient';
 import { translateDisease } from '../../utils/translationHelper';
 
+export interface CheckInActivateRequest {
+  predictionId: number;
+  userId: number;
+}
+
 export interface CheckInCreateRequest {
   userId: number;
   previousPredictionId: number;
@@ -118,6 +123,16 @@ export async function getDetailedCheckInsByUser(userId: number, lang: string = '
     }
     return Number(b.id) - Number(a.id);
   });
+}
+
+// Activate a health follow-up (user opt-in)
+export function activateCheckInRequest(request: CheckInActivateRequest): Promise<CheckInResponseDTO> {
+  return apiClient.post('/check-ins/activate', request)
+    .then((response) => response.data.data ?? response.data)
+    .catch((error) => {
+      console.error('Activating check-in failed:', error);
+      throw error;
+    });
 }
 
 // Submit a new symptom check-in
