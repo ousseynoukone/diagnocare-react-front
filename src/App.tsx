@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import PublicLayout from './layouts/PublicLayout'
 import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
+import AdminLayout from './layouts/AdminLayout'
 import { HomePage } from './pages/home/HomePage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
@@ -17,9 +18,15 @@ import SuivisPage from './pages/dashboard/suivis'
 import HistoriquePage from './pages/dashboard/historique'
 import ProfilMedicalPage from './pages/dashboard/profil'
 import ParametresPage from './pages/dashboard/parametres'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
+import AdminPredictionsPage from './pages/admin/AdminPredictionsPage'
+import AdminReportsPage from './pages/admin/AdminReportsPage'
+import AdminUrgentDiseasesPage from './pages/admin/AdminUrgentDiseasesPage'
+import AdminSettingsPage from './pages/admin/AdminSettingsPage'
 
 function App() {
-  return ( 
+  return (
     <BrowserRouter>
       <Routes>
         <Route element={<PublicLayout />}>
@@ -44,8 +51,17 @@ function App() {
           <Route path="/dashboard/profil" element={<ProfilMedicalPage />} />
           <Route path="/dashboard/parametres" element={<ParametresPage />} />
         </Route>
+
+        <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/predictions" element={<AdminPredictionsPage />} />
+          <Route path="/admin/reports" element={<AdminReportsPage />} />
+          <Route path="/admin/urgent-diseases" element={<AdminUrgentDiseasesPage />} />
+          <Route path="/admin/settings" element={<AdminSettingsPage />} />
+        </Route>
       </Routes>
-      
+
       <Toaster richColors position="top-right" />
     </BrowserRouter>
   )

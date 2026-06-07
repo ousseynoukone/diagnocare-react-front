@@ -41,7 +41,7 @@ export default function SideBar() {
       useUserStore.getState().clearUser();
     } finally {
       setIsOpen(false);
-      navigate('/');
+      navigate('/login');
     }
   };
 

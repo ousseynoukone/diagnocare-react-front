@@ -14,10 +14,9 @@ export default function NavBar() {
   const logout = useUserStore((state) => state.logout);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    setIsMenuOpen(false);
-    navigate('/');
+  const handleLogout = async () => {
+    try { await logout(); } catch { useUserStore.getState().clearUser(); }
+    finally { setIsMenuOpen(false); navigate('/login'); }
   };
 
   return (

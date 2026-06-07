@@ -3,6 +3,7 @@ import Footer from '../components/footer/Footer';
 import { useUserStore } from '../store/UserStore';
 import SideBar from '../components/head/SideBar';
 import { useProfile } from '../hooks/useProfile';
+import { Role } from '../types/models/Auth';
 
 export default function MainLayout() {
   const user = useUserStore((state) => state.user);
@@ -14,7 +15,11 @@ export default function MainLayout() {
     return <Navigate to="/login" replace />;
   }
 
-  // While checking profile status, show a loader
+  // Admins and super-admins have no business on patient routes
+  if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
+    return <Navigate to="/admin" replace />;
+  }
+
   if (isProfileLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -23,15 +28,13 @@ export default function MainLayout() {
     );
   }
 
-  // Profile is incomplete if it doesn't exist, or if age, weight, or gender are uninitialized
-  const isProfileIncomplete = !dbProfile || 
-                              !dbProfile.age || 
-                              dbProfile.age === 0 || 
-                              !dbProfile.weight || 
-                              dbProfile.weight === 0 || 
+  const isProfileIncomplete =!dbProfile ||
+                              !dbProfile.age ||
+                              dbProfile.age === 0 ||
+                              !dbProfile.weight ||
+                              dbProfile.weight === 0 ||
                               !dbProfile.gender;
 
-  // If profile is incomplete, force redirection to /dashboard/profil
   if (isProfileIncomplete && location.pathname !== '/dashboard/profil') {
     return <Navigate to="/dashboard/profil" replace />;
   }

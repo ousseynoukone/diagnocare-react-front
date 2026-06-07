@@ -6,6 +6,7 @@ import Button from '../../components/basics/Button';
 import { ArrowRight, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useLogin } from '../../hooks/useAuth';
 import type { LoginDTO } from '../../types/models/Auth';
+import { Role } from '../../types/models/Auth';
 import { useForm } from 'react-hook-form';
 import { handleApiError } from '../../utils/errorHelper';
 import { useUserStore } from '../../store/UserStore';
@@ -40,7 +41,8 @@ export default function LoginPage() {
                     localStorage.removeItem(PROFILE_STORAGE_KEY);
                 }
                 setUser(user);
-                navigate('/dashboard');
+                const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
+                navigate(isAdmin ? '/admin' : '/dashboard');
             },
             onError: (err: any) => {
                 const apiError = err?.response?.data;
