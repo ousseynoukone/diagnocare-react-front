@@ -7,6 +7,7 @@ export interface CheckInActivateRequest {
 }
 
 export interface CheckInCreateRequest {
+  checkInId: number;
   userId: number;
   previousPredictionId: number;
   symptomLabels: string[];
@@ -33,14 +34,14 @@ export interface CheckInResponseDTO {
 export interface FollowUpData {
   id: string;
   title: string;
-  status: 'pending' | 'completed';
+  status: 'pending' | 'completed' | 'locked';
   statusLabel: string;
   time: string;
   day: string;
+  lockedUntil?: string;
   rawCheckIn: CheckInResponseDTO;
 }
 
-// Fetch all check-ins for a specific user
 export function getCheckInsByUserId(userId: number): Promise<CheckInResponseDTO[]> {
   return apiClient.get('/check-ins', { params: { userId } })
     .then((response) => response.data.data ?? response.data)
@@ -50,7 +51,6 @@ export function getCheckInsByUserId(userId: number): Promise<CheckInResponseDTO[
     });
 }
 
-// Helper to format dates to French style (e.g. "12 Oct 2023, 18:00")
 function formatDateTime(dateStr: string): string {
   try {
     const dateObj = new Date(dateStr);
@@ -58,74 +58,92 @@ function formatDateTime(dateStr: string): string {
     const months = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec'];
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}, ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
-  } catch (e) {
+  } catch {
     return dateStr;
   }
 }
 
-// Fetch and hydrate all check-ins for a specific user to match local FollowUpData shape
 export async function getDetailedCheckInsByUser(userId: number, lang: string = 'fr'): Promise<FollowUpData[]> {
   const checkIns = await getCheckInsByUserId(userId);
   if (!checkIns || checkIns.length === 0) return [];
 
-  const hydrated = await Promise.all(
-    checkIns.map(async (ci) => {
+  // Fetch pathology title once per unique predictionId
+  const predIdSet = new Set(checkIns.map((ci) => ci.previousPredictionId));
+  const titleCache = new Map<number, string>();
+  await Promise.all(
+    [...predIdSet].map(async (predId) => {
       try {
-        // Fetch the pathology results of the previous prediction to get its title
-        const pathResponse = await apiClient.get(`/pathology-results/prediction/${ci.previousPredictionId}`);
-        const pathologyResults = pathResponse.data.data ?? pathResponse.data;
-        const bestPathology = Array.isArray(pathologyResults) && pathologyResults.length > 0
-          ? pathologyResults[0]
-          : null;
-
-        const title = bestPathology 
-          ? translateDisease(bestPathology.localizedDiseaseName || bestPathology.pathologyName, lang)
-          : (lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up');
-        const isCompleted = ci.status === 'COMPLETED';
-        const statusLabel = isCompleted 
-          ? (lang === 'fr' ? 'Terminé' : 'Completed') 
-          : (lang === 'fr' ? 'À faire' : 'To do');
-
-        return {
-          id: String(ci.id),
-          title,
-          status: isCompleted ? ('completed' as const) : ('pending' as const),
-          statusLabel,
-          time: ci.completedAt 
-            ? formatDateTime(ci.completedAt) 
-            : (ci.firstReminderAt ? formatDateTime(ci.firstReminderAt) : "Aujourd'hui, 18:00"),
-          day: 'J+1',
-          rawCheckIn: ci,
-        };
-      } catch (err) {
-        console.error(`Failed to hydrate check-in ${ci.id}:`, err);
-        const isCompleted = ci.status === 'COMPLETED';
-        const statusLabel = isCompleted 
-          ? (lang === 'fr' ? 'Terminé' : 'Completed') 
-          : (lang === 'fr' ? 'À faire' : 'To do');
-        return {
-          id: String(ci.id),
-          title: lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up',
-          status: isCompleted ? ('completed' as const) : ('pending' as const),
-          statusLabel,
-          time: "Aujourd'hui, 18:00",
-          day: 'J+1',
-          rawCheckIn: ci,
-        };
+        const resp = await apiClient.get(`/pathology-results/prediction/${predId}`);
+        const results = resp.data.data ?? resp.data;
+        const best = Array.isArray(results) && results.length > 0 ? results[0] : null;
+        titleCache.set(
+          predId,
+          best
+            ? translateDisease(best.localizedDiseaseName || best.pathologyName, lang)
+            : (lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up'),
+        );
+      } catch {
+        titleCache.set(predId, lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up');
       }
-    })
+    }),
   );
 
-  // Sort: pending first, then by id descending
+  // Group by previousPredictionId then sort by firstReminderAt to assign J+1 / J+2 labels
+  const grouped = new Map<number, CheckInResponseDTO[]>();
+  for (const ci of checkIns) {
+    const list = grouped.get(ci.previousPredictionId) ?? [];
+    list.push(ci);
+    grouped.set(ci.previousPredictionId, list);
+  }
+  for (const list of grouped.values()) {
+    list.sort((a, b) => (a.firstReminderAt ?? '').localeCompare(b.firstReminderAt ?? ''));
+  }
+
+  const now = new Date();
+
+  const hydrated: FollowUpData[] = [];
+  for (const [predId, cis] of grouped) {
+    const title = titleCache.get(predId) ?? (lang === 'fr' ? 'Suivi de symptômes' : 'Symptom Follow-up');
+    cis.forEach((ci, index) => {
+      const roundLabel = `J+${index + 1}`;
+      const isCompleted = ci.status === 'COMPLETED';
+      const isLocked = !isCompleted && ci.firstReminderAt != null && new Date(ci.firstReminderAt) > now;
+
+      const status: FollowUpData['status'] = isCompleted ? 'completed' : isLocked ? 'locked' : 'pending';
+
+      const statusLabel = isCompleted
+        ? (lang === 'fr' ? 'Terminé' : 'Completed')
+        : isLocked
+          ? (lang === 'fr' ? 'Pas encore disponible' : 'Not yet available')
+          : (lang === 'fr' ? 'À faire' : 'To do');
+
+      const time = isCompleted && ci.completedAt
+        ? formatDateTime(ci.completedAt)
+        : ci.firstReminderAt
+          ? formatDateTime(ci.firstReminderAt)
+          : (lang === 'fr' ? "Bientôt" : 'Soon');
+
+      hydrated.push({
+        id: String(ci.id),
+        title,
+        status,
+        statusLabel,
+        time,
+        day: roundLabel,
+        lockedUntil: isLocked && ci.firstReminderAt ? formatDateTime(ci.firstReminderAt) : undefined,
+        rawCheckIn: ci,
+      });
+    });
+  }
+
+  // Sort: pending first, then locked, then completed; within same status by id
   return hydrated.sort((a, b) => {
-    if (a.status !== b.status) {
-      return a.status === 'pending' ? -1 : 1;
-    }
-    return Number(b.id) - Number(a.id);
+    const order = { pending: 0, locked: 1, completed: 2 };
+    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+    return Number(a.id) - Number(b.id);
   });
 }
 
-// Activate a health follow-up (user opt-in)
 export function activateCheckInRequest(request: CheckInActivateRequest): Promise<CheckInResponseDTO> {
   return apiClient.post('/check-ins/activate', request)
     .then((response) => response.data.data ?? response.data)
@@ -135,7 +153,6 @@ export function activateCheckInRequest(request: CheckInActivateRequest): Promise
     });
 }
 
-// Submit a new symptom check-in
 export function submitCheckInRequest(request: CheckInCreateRequest): Promise<CheckInResponseDTO> {
   return apiClient.post('/check-ins', request)
     .then((response) => response.data.data ?? response.data)

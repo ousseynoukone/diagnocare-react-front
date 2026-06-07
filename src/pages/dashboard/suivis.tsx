@@ -25,7 +25,7 @@ export default function SuivisPage() {
   const [activeFollowUp, setActiveFollowUp] = useState<FollowUpData | null>(null);
   const [viewResult, setViewResult] = useState<{ result: CheckInResponseDTO; title: string } | null>(null);
 
-  const pendingList = checkIns.filter((f) => f.status === 'pending');
+  const pendingList = checkIns.filter((f) => f.status === 'pending' || f.status === 'locked');
   const completedList = checkIns.filter((f) => f.status === 'completed');
 
   // Derive the current language symptom list for the modal
@@ -53,6 +53,7 @@ export default function SuivisPage() {
   };
 
   const handleCommencer = (followUp: FollowUpData) => {
+    if (followUp.status === 'locked') return;
     setActiveFollowUp(followUp);
   };
 
@@ -67,6 +68,7 @@ export default function SuivisPage() {
     const isFrLang = i18n.language.startsWith('fr');
     try {
       const result = await submitCheckInMutation.mutateAsync({
+        checkInId: activeFollowUp.rawCheckIn.id,
         userId: user.id,
         previousPredictionId: activeFollowUp.rawCheckIn.previousPredictionId,
         symptomLabels: symptomIds,
@@ -134,6 +136,7 @@ export default function SuivisPage() {
                   statusLabel={item.statusLabel}
                   time={item.time}
                   day={item.day}
+                  lockedUntil={item.lockedUntil}
                   onAction={() => handleCommencer(item)}
                 />
               ))}
