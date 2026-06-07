@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { handleApiError } from '../../utils/errorHelper';
 import { useUserStore } from '../../store/UserStore';
 import { toUserProfileDTO } from '../../types/models/User';
+import { PROFILE_STORAGE_KEY } from '../../types/models/MedicalProfil';
 
 export default function LoginPage() {
     const { t } = useTranslation();
@@ -34,6 +35,10 @@ export default function LoginPage() {
             onSuccess: (data: any) => {
                 const rawUser = data.user ?? data;
                 const user = toUserProfileDTO(rawUser);
+                const previousUser = useUserStore.getState().user;
+                if (!previousUser || previousUser.id !== user.id) {
+                    localStorage.removeItem(PROFILE_STORAGE_KEY);
+                }
                 setUser(user);
                 navigate('/dashboard');
             },

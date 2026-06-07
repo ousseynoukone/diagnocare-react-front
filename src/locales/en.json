@@ -455,7 +455,8 @@
         "tension": "Average blood pressure",
         "cholesterol": "Total cholesterol (g/L)",
         "antecedents": "Major family medical history",
-        "antecedents_placeholder": "Diabetes, hypertension, heart diseases..."
+        "antecedents_placeholder": "Diabetes, hypertension, heart diseases...",
+        "optional": "optional"
       },
       "parametres": {
         "title": "Settings",

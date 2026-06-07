@@ -22,6 +22,9 @@ export default function HealthIndicatorsCard({ tension, cholesterol, antecedents
         </div>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">
           {t('dashboard.pages.profil.section_indicators', 'Indicateurs de santé')}
+          <span className="ml-2 text-xs font-semibold text-slate-400 dark:text-slate-500 normal-case tracking-normal">
+            ({t('dashboard.pages.profil.optional', 'optionnel')})
+          </span>
         </h2>
       </div>
 

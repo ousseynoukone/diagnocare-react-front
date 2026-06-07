@@ -89,15 +89,19 @@ export default function ProfilMedicalPage() {
     const heightM = heightCm / 100;
     const bmi = weight && heightM ? Math.round(weight / (heightM * heightM)) : 0;
 
-    // Parse and validate blood pressure (systolic/diastolic) if entered
-    let meanBloodPressure = 0;
-    if (profile.tension) {
+    const tensionValue = profile.tension.trim();
+    const cholesterolValue = profile.cholesterol.trim();
+    const antecedentsValue = profile.antecedents.trim();
+
+    // Parse and validate blood pressure (systolic/diastolic) only if entered
+    let meanBloodPressure: number | undefined;
+    if (tensionValue) {
       const tensionRegex = /^\d{1,3}\/\d{1,3}$/;
-      if (!tensionRegex.test(profile.tension)) {
+      if (!tensionRegex.test(tensionValue)) {
         toast.error(t('dashboard.pages.profil.validation.tension_format', "La tension doit être au format Systolique/Diastolique (ex: 12/8 ou 120/80)."));
         return;
       }
-      const parts = profile.tension.split('/');
+      const parts = tensionValue.split('/');
       const sys = parseFloat(parts[0]) || 0;
       const dia = parseFloat(parts[1]) || 0;
       
@@ -115,10 +119,10 @@ export default function ProfilMedicalPage() {
       meanBloodPressure = normSys;
     }
 
-    // Parse and validate cholesterol if entered
-    let meanCholesterol = 0;
-    if (profile.cholesterol) {
-      const rawChol = parseFloat(profile.cholesterol);
+    // Parse and validate cholesterol only if entered
+    let meanCholesterol: number | undefined;
+    if (cholesterolValue) {
+      const rawChol = parseFloat(cholesterolValue);
       if (isNaN(rawChol) || rawChol <= 0) {
         toast.error(t('dashboard.pages.profil.validation.chol_invalid', "Veuillez entrer une valeur de cholestérol valide."));
         return;
@@ -134,17 +138,22 @@ export default function ProfilMedicalPage() {
     const sedentary = profile.activite.includes('Sédentaire');
     const isSmoking = profile.tabac === 'oui';
     const alcohol = profile.alcool !== 'jamais';
-    const familyAntecedents = profile.antecedents
-      ? profile.antecedents.split(',').map((s) => s.trim()).filter(Boolean)
+    const familyAntecedents = antecedentsValue
+      ? antecedentsValue.split(',').map((s) => s.trim()).filter(Boolean)
       : [];
+
+    if (!gender) {
+      toast.error(t('dashboard.pages.profil.validation.gender', 'Veuillez sélectionner un sexe biologique (Homme ou Femme).'));
+      return;
+    }
 
     const requestPayload = {
       userId: user.id,
       age,
       gender,
       weight,
-      meanBloodPressure: meanBloodPressure || undefined,
-      meanCholesterol: meanCholesterol || undefined,
+      meanBloodPressure,
+      meanCholesterol,
       sedentary,
       bmi,
       alcohol,
@@ -158,8 +167,13 @@ export default function ProfilMedicalPage() {
     try {
       await saveProfileMutation.mutateAsync(requestPayload);
       toast.success(t('dashboard.pages.profil.save_success', 'Profil médical enregistré avec succès !'));
-    } catch (err) {
-      toast.error(t('dashboard.pages.profil.save_error', 'Erreur lors de l\'enregistrement du profil médical.'));
+    } catch (err: any) {
+      const apiMessage = err?.response?.data?.message;
+      if (err?.response?.status === 404 && apiMessage?.includes('User not found')) {
+        toast.error(t('dashboard.pages.profil.save_error_stale_session', 'Session expirée ou compte introuvable. Déconnectez-vous puis reconnectez-vous.'));
+        return;
+      }
+      toast.error(apiMessage || t('dashboard.pages.profil.save_error', 'Erreur lors de l\'enregistrement du profil médical.'));
     }
   };
 
@@ -210,7 +224,7 @@ export default function ProfilMedicalPage() {
                 {t('dashboard.pages.profil.incomplete_title', 'Profil médical obligatoire')}
               </h4>
               <p className="text-xs sm:text-sm text-amber-705 dark:text-amber-400 leading-relaxed mt-1 font-semibold">
-                {t('dashboard.pages.profil.incomplete_desc', 'Veuillez renseigner et enregistrer vos informations médicales obligatoires (Âge, Sexe biologique, Poids et Taille) pour débloquer l\'utilisation de l\'application.')}
+                {t('dashboard.pages.profil.incomplete_desc', 'Veuillez renseigner et enregistrer les informations obligatoires : Âge, Sexe biologique, Poids et Taille. Les indicateurs de santé sont optionnels.')}
               </p>
             </div>
           </div>

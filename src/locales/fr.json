@@ -455,7 +455,8 @@
         "tension": "Tension artérielle moyenne",
         "cholesterol": "Cholestérol total (g/L)",
         "antecedents": "Antécédents familiaux majeurs",
-        "antecedents_placeholder": "Diabète, hypertension, maladies cardiaques..."
+        "antecedents_placeholder": "Diabète, hypertension, maladies cardiaques...",
+        "optional": "optionnel"
       },
       "parametres": {
         "title": "Paramètres",
