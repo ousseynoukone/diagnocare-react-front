@@ -13,7 +13,10 @@ export interface Doctor {
   address: string;
   nextSlot: string;
   coords: { x: number; y: number };
+  lat?: number;
+  lng?: number;
   phone: string;
+  website?: string;
 }
 
 export interface DiagnosisPossibility {

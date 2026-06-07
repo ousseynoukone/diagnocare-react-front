@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Activity, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import SymptomSelector from '../../components/dashboard/evaluation/SymptomSelector';
 import AnalysisLoading from '../../components/dashboard/evaluation/AnalysisLoading';
@@ -14,46 +15,7 @@ import { useUserStore } from '../../store/UserStore';
 import { useMLSymptomsMetadata } from '../../hooks/useSymptoms';
 import type { PredictionWithResultsResponse } from '../../types/models/Prediction';
 import { translateDisease, translateSpecialist } from '../../utils/translationHelper';
-
-
-const getDoctorsForSpecialist = (specialist: string, lang: string): Doctor[] => {
-  const isEn = lang.startsWith('en');
-  return [
-    {
-      name: 'Dr. Sophie Martin',
-      specialist: specialist,
-      sector: isEn ? 'Tier 1' : 'Secteur 1',
-      rating: 4.9,
-      reviews: 124,
-      address: isEn ? '15 Republic Street, 75001 Paris' : '15 Rue de la République, 75001 Paris',
-      nextSlot: isEn ? "Today at 16:30" : "Aujourd'hui à 16:30",
-      coords: { x: 120, y: 150 },
-      phone: '01 42 27 88 12'
-    },
-    {
-      name: 'Dr. Thomas Dubois',
-      specialist: specialist,
-      sector: isEn ? 'Tier 1' : 'Secteur 1',
-      rating: 4.7,
-      reviews: 89,
-      address: isEn ? '42 Saint-Germain Boulevard, 75005 Paris' : '42 Boulevard Saint-Germain, 75005 Paris',
-      nextSlot: isEn ? 'Tomorrow at 09:00' : 'Demain à 09:00',
-      coords: { x: 260, y: 220 },
-      phone: '01 45 82 19 33'
-    },
-    {
-      name: 'Dr. Marc Lepitre',
-      specialist: specialist,
-      sector: isEn ? 'Tier 2' : 'Secteur 2',
-      rating: 4.8,
-      reviews: 42,
-      address: isEn ? '8 Foch Avenue, 75116 Paris' : '8 Avenue Foch, 75116 Paris',
-      nextSlot: isEn ? 'Fri Jun 5 at 14:00' : 'Ven 5 Juin à 14:00',
-      coords: { x: 70, y: 240 },
-      phone: '01 40 56 12 99'
-    }
-  ];
-};
+import { searchDoctors } from '../../api-s/services/googlePlacesService';
 
 function mapBackendResponse(response: PredictionWithResultsResponse, lang: string): PredictionResult {
   const isFr = lang.startsWith('fr');
@@ -70,7 +32,7 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
       specialist: defaultSpecialist,
       urgent: response.prediction?.isRedAlert || false,
       alternatives: [],
-      doctors: getDoctorsForSpecialist(defaultSpecialist, lang)
+      doctors: []
     };
   }
 
@@ -132,7 +94,7 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
     specialistConfidence,
     urgent: response.prediction?.isRedAlert || false,
     alternatives,
-    doctors: getDoctorsForSpecialist(specialist, lang),
+    doctors: [],
     profileUsed,
     allPossibilities
   };
@@ -140,12 +102,18 @@ function mapBackendResponse(response: PredictionWithResultsResponse, lang: strin
 
 export default function EvaluationPage() {
   const { t, i18n } = useTranslation();
-  
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const evaluationState = useEvaluationStore((state) => state.evaluationState);
   const setEvaluationState = useEvaluationStore((state) => state.setEvaluationState);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [resultData, setResultData] = useState<PredictionResult | null>(null);
   const [selectedSpecialist, setSelectedSpecialist] = useState<string>('');
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
+  const [searchLocation, setSearchLocation] = useState('Île-de-France, France');
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const user = useUserStore((state) => state.user);
   const { mutateAsync: createPrediction } = useCreatePrediction();
@@ -190,6 +158,65 @@ export default function EvaluationPage() {
     );
   };
 
+  const handleSearchDoctors = async (
+    specialist: string,
+    location: string,
+    coords?: { lat: number; lng: number }
+  ) => {
+    setSearchLocation(location);
+    setIsLoadingDoctors(true); // also called directly from search bar button
+    try {
+      const results = await searchDoctors(specialist, location, coords);
+      setDoctors(results);
+    } catch (err) {
+      console.error('Doctor search failed:', err);
+      toast.error(t('dashboard.pages.evaluation.doctor_search_error', 'Impossible de trouver des médecins. Vérifiez votre clé API Google.'));
+      setDoctors([]);
+    } finally {
+      setIsLoadingDoctors(false);
+    }
+  };
+
+  const requestGeolocationAndSearch = (specName: string) => {
+    // Show loading skeleton immediately — don't wait for geolocation
+    setIsLoadingDoctors(true);
+
+    const runSearch = async (coords?: { lat: number; lng: number }) => {
+      let location = 'Île-de-France, France';
+      if (coords) {
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`
+          );
+          const data = await res.json();
+          location =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.county ||
+            'Île-de-France, France';
+        } catch { /* keep default */ }
+      }
+      setSearchLocation(location);
+      await handleSearchDoctors(specName, location, coords);
+    };
+
+    if (!navigator.geolocation) {
+      runSearch();
+      return;
+    }
+
+    // 5s timeout — if browser silently blocks geolocation, fall back to Île-de-France
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setUserCoords(coords);
+        runSearch(coords);
+      },
+      () => runSearch(),
+      { timeout: 5000, maximumAge: 60000 }
+    );
+  };
+
   // Trigger analysis state transition and API call
   const handleStartAnalysis = async () => {
     if (selectedSymptoms.length === 0 || !user?.id) return;
@@ -217,13 +244,30 @@ export default function EvaluationPage() {
     }
   };
 
-  // If page reloads and state is RESULT/LOADING/SEARCH_SPECIALIST but resultData is null,
-  // we reset evaluationState to SELECTION
+  // If page reloads and state is RESULT/LOADING but resultData is null, reset to SELECTION.
+  // SEARCH_SPECIALIST is excluded: it's valid without resultData (navigation from historique).
   useEffect(() => {
-    if (evaluationState !== EvaluationState.START && evaluationState !== EvaluationState.SELECTION && !resultData) {
+    const isStaleState =
+      evaluationState !== EvaluationState.START &&
+      evaluationState !== EvaluationState.SELECTION &&
+      evaluationState !== EvaluationState.SEARCH_SPECIALIST;
+    if (isStaleState && !resultData) {
       setEvaluationState(EvaluationState.SELECTION);
     }
   }, [evaluationState, resultData]);
+
+  // Handle navigation from historique: { openSpecialistFinder: true, specialist: '...' }
+  useEffect(() => {
+    const navState = location.state as { openSpecialistFinder?: boolean; specialist?: string } | null;
+    if (navState?.openSpecialistFinder && navState.specialist) {
+      const spec = navState.specialist;
+      setSelectedSpecialist(spec);
+      setEvaluationState(EvaluationState.SEARCH_SPECIALIST);
+      requestGeolocationAndSearch(spec);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Show a premium loading spinner while fetching the symptoms list from the backend
   if (isLoadingSymptoms) {
@@ -300,17 +344,23 @@ export default function EvaluationPage() {
           onBackToSelection={() => setEvaluationState(EvaluationState.SELECTION)}
           onFindSpecialists={(specName) => {
             setSelectedSpecialist(specName);
+            setDoctors([]);
             setEvaluationState(EvaluationState.SEARCH_SPECIALIST);
+            requestGeolocationAndSearch(specName);
           }}
         />
       )}
 
       {/* State 4: Recommended specialist and locator map */}
-      {evaluationState === EvaluationState.SEARCH_SPECIALIST && resultData && (
-        <SpecialistFinder 
-          specialist={selectedSpecialist || resultData.specialist}
-          doctors={getDoctorsForSpecialist(selectedSpecialist || resultData.specialist, i18n.language)}
-          onBackToResults={() => setEvaluationState(EvaluationState.RESULT)}
+      {evaluationState === EvaluationState.SEARCH_SPECIALIST && (
+        <SpecialistFinder
+          specialist={selectedSpecialist || (resultData?.specialist ?? '')}
+          doctors={doctors}
+          isLoadingDoctors={isLoadingDoctors}
+          location={searchLocation}
+          userCoords={userCoords}
+          onSearch={handleSearchDoctors}
+          onBackToResults={() => setEvaluationState(resultData ? EvaluationState.RESULT : EvaluationState.START)}
         />
       )}
 

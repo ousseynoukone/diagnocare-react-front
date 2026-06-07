@@ -1,33 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Download, CheckCircle, MapPin, AlertTriangle, X } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle, MapPin, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import type { PredictionResult, DiagnosisPossibility } from '../../../types/models/Evaluation';
-import { apiClient } from '../../../api-s/AxiosApiClient';
-import { useCreateReport } from '../../../hooks/useReports';
-import { useUserStore } from '../../../store/UserStore';
-
-const getConfidenceStyles = (score: number) => {
-  if (score >= 70) {
-    return {
-      text: 'text-emerald-600 dark:text-emerald-400',
-      bar: 'bg-emerald-500 dark:bg-emerald-400',
-      badge: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border-emerald-250 dark:border-emerald-900/50'
-    };
-  } else if (score >= 40) {
-    return {
-      text: 'text-amber-650 dark:text-amber-400',
-      bar: 'bg-amber-500 dark:bg-amber-400',
-      badge: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-250 dark:border-amber-900/50'
-    };
-  } else {
-    return {
-      text: 'text-indigo-600 dark:text-indigo-450',
-      bar: 'bg-indigo-500 dark:bg-indigo-400',
-      badge: 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 border-indigo-250 dark:border-indigo-900/50'
-    };
-  }
-};
+import { getConfidenceStyles } from '../../../utils/confidenceStyles';
+import { useDownloadPDF } from '../../../hooks/useDownloadPDF';
+import ReportModal from '../../shared/ReportModal';
 
 interface EvaluationResultProps {
   resultData: PredictionResult;
@@ -41,39 +18,9 @@ export default function EvaluationResult({
   onFindSpecialists,
 }: EvaluationResultProps) {
   const { t, i18n } = useTranslation();
-  const user = useUserStore((state) => state.user);
-  const createReportMutation = useCreateReport();
+  const { downloadPDF } = useDownloadPDF();
 
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const [reportTitle, setReportTitle] = useState('');
-  const [reportComment, setReportComment] = useState('');
-
-  const handleOpenReport = () => {
-    setReportTitle('');
-    setReportComment('');
-    setIsReportOpen(true);
-  };
-
-  const handleSubmitReport = async () => {
-    if (!user?.id || !resultData.id) return;
-    if (!reportTitle.trim() || !reportComment.trim()) {
-      toast.error(t('dashboard.pages.evaluation.report_fields_required', 'Veuillez remplir le titre et le commentaire.'));
-      return;
-    }
-
-    try {
-      await createReportMutation.mutateAsync({
-        userId: user.id,
-        predictionId: resultData.id,
-        title: reportTitle,
-        comment: reportComment,
-      });
-      toast.success(t('dashboard.pages.evaluation.report_success', 'Signalement envoyé avec succès.'));
-      setIsReportOpen(false);
-    } catch (error) {
-      toast.error(t('dashboard.pages.evaluation.report_error', 'Erreur lors de l\'envoi du signalement.'));
-    }
-  };
 
   const allPossibilities = resultData.allPossibilities || [
     {
@@ -104,31 +51,6 @@ export default function EvaluationResult({
 
   const styles = getConfidenceStyles(activePossibility.confidence);
 
-  const handleDownloadPDF = async () => {
-    if (!resultData.id) {
-      toast.error(t('auth.verify_email.success_code_sent') ? "Impossible de générer le PDF : ID manquant." : "Cannot generate PDF: Missing ID.");
-      return;
-    }
-    const toastId = toast.loading(t('auth.verify_email.success_code_sent') ? "Génération du rapport PDF en cours..." : "Generating PDF report...");
-    try {
-      const response = await apiClient.get(`/consultation-summaries/${resultData.id}/pdf`, {
-        responseType: 'blob'
-      });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `consultation-summary-${resultData.id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      toast.success(t('auth.verify_email.success_code_sent') ? "Rapport PDF téléchargé avec succès !" : "PDF report downloaded successfully!", { id: toastId });
-    } catch (error) {
-      console.error("Failed to download PDF:", error);
-      toast.error(t('auth.verify_email.success_code_sent') ? "Erreur lors de la génération du PDF." : "Error generating PDF report.", { id: toastId });
-    }
-  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -143,16 +65,17 @@ export default function EvaluationResult({
         </button>
         
         <div className="flex items-center gap-3">
-          <button 
-            onClick={handleDownloadPDF}
-            className="flex items-center gap-2 bg-white dark:bg-background-900 border border-background-200 dark:border-background-800 hover:bg-background-50 dark:hover:bg-background-800 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors cursor-pointer text-background-700 dark:text-background-200"
+          <button
+            onClick={() => resultData.id && downloadPDF(resultData.id)}
+            disabled={!resultData.id}
+            className="flex items-center gap-2 bg-white dark:bg-background-900 border border-background-200 dark:border-background-800 hover:bg-background-50 dark:hover:bg-background-800 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors cursor-pointer text-background-700 dark:text-background-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="h-4 w-4 text-background-500" />
             {t('dashboard.pages.evaluation.result_pdf', 'PDF')}
           </button>
 
-          <button 
-            onClick={handleOpenReport}
+          <button
+            onClick={() => setIsReportOpen(true)}
             className="flex items-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-250 hover:border-amber-300 dark:bg-amber-950/40 dark:hover:bg-amber-900/40 dark:border-amber-900/50 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-colors cursor-pointer text-amber-700 dark:text-amber-400"
           >
             <AlertTriangle className="h-4 w-4" />
@@ -435,75 +358,7 @@ export default function EvaluationResult({
         </div>
       </div>
 
-      {/* Report Issue Modal */}
-      {isReportOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl p-8 space-y-6 animate-scaleIn">
-            <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <AlertTriangle className="h-5.5 w-5.5 text-amber-500" />
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                  {t('dashboard.pages.evaluation.report_modal_title', 'Signaler un problème')}
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsReportOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  {t('dashboard.pages.evaluation.report_title_label', 'Titre de l\'anomalie')}
-                </label>
-                <input
-                  type="text"
-                  value={reportTitle}
-                  onChange={(e) => setReportTitle(e.target.value)}
-                  placeholder={t('dashboard.pages.evaluation.report_title_placeholder', 'Ex: Diagnostic incohérent, symptômes erronés...')}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 placeholder-slate-400 dark:placeholder-slate-500 transition-all shadow-inner"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  {t('dashboard.pages.evaluation.report_comment_label', 'Commentaires')}
-                </label>
-                <textarea
-                  value={reportComment}
-                  onChange={(e) => setReportComment(e.target.value)}
-                  rows={5}
-                  placeholder={t('dashboard.pages.evaluation.report_comment_placeholder', 'Veuillez décrire en détail le problème rencontré pour nous aider à améliorer notre algorithme...')}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 placeholder-slate-400 dark:placeholder-slate-500 transition-all resize-none shadow-inner leading-relaxed"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <button
-                onClick={() => setIsReportOpen(false)}
-                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold px-6 py-3 rounded-xl text-sm transition-colors cursor-pointer"
-              >
-                {t('common.cancel', 'Annuler')}
-              </button>
-              <button
-                onClick={handleSubmitReport}
-                disabled={createReportMutation.isPending || !reportTitle.trim() || !reportComment.trim()}
-                className={`font-bold px-6 py-3 rounded-xl text-sm transition-all cursor-pointer text-white shadow-md ${
-                  !reportTitle.trim() || !reportComment.trim()
-                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-50 shadow-none'
-                    : 'bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 shadow-amber-500/10'
-                }`}
-              >
-                {createReportMutation.isPending ? t('common.sending', 'Envoi...') : t('common.send', 'Envoyer')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ReportModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} predId={resultData.id ?? null} />
     </div>
   );
 }

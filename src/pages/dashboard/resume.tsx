@@ -1,22 +1,15 @@
 import { Printer, Download, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../../store/UserStore';
-import { toast } from 'sonner';
 
 export default function ResumePage() {
   const { t } = useTranslation();
   const user = useUserStore((state) => state.user);
 
-  const getFullName = () => {
-    return user ? `${user.firstName} ${user.lastName}` : 'Jean Dupont';
-  };
+  const fullName = user ? `${user.firstName} ${user.lastName}`.trim() : '—';
 
   const handlePrint = () => {
     window.print();
-  };
-
-  const handleDownloadPDF = () => {
-    toast.success(t('auth.verify_email.success_code_sent') ? "Téléchargement du rapport PDF lancé." : "PDF report download started.");
   };
 
   return (
@@ -42,8 +35,9 @@ export default function ResumePage() {
           </button>
 
           <button
-            onClick={handleDownloadPDF}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-primary/10 transition-colors cursor-pointer"
+            disabled
+            title={t('dashboard.pages.resume.pdf_from_history', 'Téléchargez le PDF depuis votre historique')}
+            className="inline-flex items-center gap-2 bg-primary/50 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-primary/10 cursor-not-allowed opacity-60"
           >
             <Download className="h-4 w-4" />
             <span>Télécharger PDF</span>
@@ -83,7 +77,7 @@ export default function ResumePage() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-base font-extrabold text-slate-900 dark:text-white">
-                    {getFullName()}
+                    {fullName}
                   </p>
                   <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     35 ans • Homme
