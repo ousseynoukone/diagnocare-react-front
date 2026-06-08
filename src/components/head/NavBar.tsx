@@ -2,7 +2,7 @@ import logo from '../../assets/logo-blue.svg';
 import ToggleDarkMode from '../basics/ToggleDarkMode';
 import { useState } from 'react';
 import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import SwitchLanguage from '../basics/SwitchLanguage';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../../store/UserStore';
@@ -13,6 +13,17 @@ export default function NavBar() {
   const user = useUserStore((state) => state.user);
   const logout = useUserStore((state) => state.logout);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavLink = (sectionId: string) => {
+    setIsMenuOpen(false);
+    const isHome = location.pathname === '/' || location.pathname === '/home';
+    if (isHome) {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/home', { state: { scrollTo: sectionId } });
+    }
+  };
 
   const handleLogout = async () => {
     try { await logout(); } catch { useUserStore.getState().clearUser(); }
@@ -31,18 +42,18 @@ export default function NavBar() {
 
         {/* Desktop Nav */}
         <div className="items-center gap-3 hidden lg:flex">
-          <a
-            href="#how-it-works"
+          <button
+            onClick={() => handleNavLink('how-it-works')}
             className="text-sm font-medium text-background-600 hover:text-background-900 dark:text-background-300 dark:hover:text-background-50 transition-colors cursor-pointer"
           >
             {t('nav.how_it_works')}
-          </a>
-          <a
-            href="#faq"
+          </button>
+          <button
+            onClick={() => handleNavLink('faq')}
             className="text-sm font-medium text-background-600 hover:text-background-900 dark:text-background-300 dark:hover:text-background-50 transition-colors cursor-pointer"
           >
             {t('nav.faq')}
-          </a>
+          </button>
 
           <div className="h-10 w-0.5 bg-background-200 dark:bg-background-700 mx-2"></div>
 
@@ -153,20 +164,18 @@ export default function NavBar() {
                   </div>
                 )}
 
-                <a
-                  href="#how-it-works"
-                  className="block px-4 my-1 py-2 text-background-700 dark:text-background-300 hover:bg-background-100 dark:hover:bg-background-800 rounded-lg transition-colors cursor-pointer"
-                  onClick={() => setIsMenuOpen(false)}
+                <button
+                  onClick={() => handleNavLink('how-it-works')}
+                  className="block w-full text-left px-4 my-1 py-2 text-background-700 dark:text-background-300 hover:bg-background-100 dark:hover:bg-background-800 rounded-lg transition-colors cursor-pointer"
                 >
                   {t('nav.how_it_works')}
-                </a>
-                <a
-                  href="#faq"
-                  className="block px-4 my-1 py-2 text-background-700 dark:text-background-300 hover:bg-background-100 dark:hover:bg-background-800 rounded-lg transition-colors cursor-pointer"
-                  onClick={() => setIsMenuOpen(false)}
+                </button>
+                <button
+                  onClick={() => handleNavLink('faq')}
+                  className="block w-full text-left px-4 my-1 py-2 text-background-700 dark:text-background-300 hover:bg-background-100 dark:hover:bg-background-800 rounded-lg transition-colors cursor-pointer"
                 >
                   {t('nav.faq')}
-                </a>
+                </button>
 
                 <div className="px-4 pt-4 border-t border-background-200 dark:border-background-700 flex flex-col gap-3">
                   {user ? (

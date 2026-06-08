@@ -24,7 +24,6 @@ import AdminPredictionsPage from './pages/admin/AdminPredictionsPage'
 import AdminReportsPage from './pages/admin/AdminReportsPage'
 import AdminUrgentDiseasesPage from './pages/admin/AdminUrgentDiseasesPage'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage'
-
 function App() {
   return (
     <BrowserRouter>

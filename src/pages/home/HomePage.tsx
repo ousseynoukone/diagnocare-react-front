@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import heroImg from '../../assets/doctor.png'
 import signalImg from '../../assets/signal.png'
@@ -13,6 +13,16 @@ export function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0)
   const { t } = useTranslation()
   const user = useUserStore((state) => state.user)
+  const location = useLocation()
+
+  useEffect(() => {
+    const sectionId = (location.state as { scrollTo?: string } | null)?.scrollTo
+    if (!sectionId) return
+    const el = document.getElementById(sectionId)
+    if (el) {
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
+    }
+  }, [location.state])
   const actionLink = user ? '/dashboard' : '/login'
 
   // Safely retrieve the localized FAQ items array

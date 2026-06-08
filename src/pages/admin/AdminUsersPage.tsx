@@ -7,21 +7,24 @@ import { AdminSetPasswordRequest } from '../../api-s/requests/AuthRequest';
 import { useUserStore } from '../../store/UserStore';
 import { Role } from '../../types/models/Auth';
 
-function roleLabel(roles: Array<{ id: number; roleName?: string; name?: string }>) {
-  if (!roles || roles.length === 0) return 'Patient';
-  const id = roles[0].id;
-  if (id === Role.SUPER_ADMIN) return 'Super Admin';
-  if (id === Role.ADMIN) return 'Admin';
-  if (id === Role.DOCTOR) return 'Médecin';
-  if (id === Role.OPERATOR) return 'Opérateur';
+function roleName(roles: Array<{ id: number; name?: string }>): string {
+  return roles?.[0]?.name ?? '';
+}
+
+function roleLabel(roles: Array<{ id: number; name?: string }>) {
+  const n = roleName(roles);
+  if (n === 'SUPER_ADMIN') return 'Super Admin';
+  if (n === 'ADMIN') return 'Admin';
+  if (n === 'DOCTOR') return 'Médecin';
+  if (n === 'OPERATOR') return 'Opérateur';
   return 'Patient';
 }
 
-function roleBadgeClass(roles: Array<{ id: number }>) {
-  const id = roles?.[0]?.id;
-  if (id === Role.SUPER_ADMIN) return 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800/50';
-  if (id === Role.ADMIN) return 'bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/50';
-  if (id === Role.DOCTOR) return 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50';
+function roleBadgeClass(roles: Array<{ id: number; name?: string }>) {
+  const n = roleName(roles);
+  if (n === 'SUPER_ADMIN') return 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800/50';
+  if (n === 'ADMIN') return 'bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/50';
+  if (n === 'DOCTOR') return 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50';
   return 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700';
 }
 
@@ -206,7 +209,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        {isSuperAdmin && u.id !== currentUser?.id && u.roles?.[0]?.id !== Role.SUPER_ADMIN && (
+                        {isSuperAdmin && u.id !== currentUser?.id && u.roles?.[0]?.name !== 'SUPER_ADMIN' && (
                           <button
                             onClick={() => setResetTarget({ id: u.id, name: `${u.firstName} ${u.lastName}` })}
                             className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition-colors cursor-pointer"
