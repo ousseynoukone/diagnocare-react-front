@@ -6,6 +6,7 @@ COPY package.json ./
 COPY bun.lock ./
 RUN npm install
 
+COPY .env .
 COPY . .
 ARG REACT_APP_API_BASE_URL=http://localhost:8765/api/v1
 ENV REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
