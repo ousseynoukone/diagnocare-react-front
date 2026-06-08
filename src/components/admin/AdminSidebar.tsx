@@ -1,11 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, Brain, AlertTriangle, ShieldAlert, Settings, LogOut, Menu, X, ExternalLink
+  LayoutDashboard, Users, Brain, AlertTriangle, ShieldAlert, Settings, LogOut, Menu, X, ExternalLink, KeyRound, Eye, EyeOff
 } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { useUserStore } from '../../store/UserStore';
 import { useState } from 'react';
 import logoBlue from '../../assets/logo-blue.svg';
 import ToggleDarkMode from '../basics/ToggleDarkMode';
+import { ChangePasswordRequest } from '../../api-s/requests/AuthRequest';
 
 const menuItems = [
   { label: 'Tableau de bord', path: '/admin', icon: LayoutDashboard, end: true },
@@ -21,6 +24,32 @@ export default function AdminSidebar() {
   const logout = useUserStore((s) => s.logout);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [showChangePwd, setShowChangePwd] = useState(false);
+  const [pwdForm, setPwdForm] = useState({ current: '', next: '', confirm: '' });
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+
+  const changePwdMutation = useMutation({
+    mutationFn: () => ChangePasswordRequest(user!.id, pwdForm.current, pwdForm.next),
+    onSuccess: () => {
+      toast.success('Mot de passe modifié');
+      setShowChangePwd(false);
+      setPwdForm({ current: '', next: '', confirm: '' });
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message ?? 'Impossible de modifier le mot de passe';
+      toast.error(msg);
+    },
+  });
+
+  const handleChangePwd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwdForm.next !== pwdForm.confirm) {
+      toast.error('Les mots de passe ne correspondent pas');
+      return;
+    }
+    changePwdMutation.mutate();
+  };
 
   const handleLogout = async () => {
     try { await logout(); } catch { useUserStore.getState().clearUser(); }
@@ -99,6 +128,14 @@ export default function AdminSidebar() {
         </div>
 
         <button
+          onClick={() => { setShowChangePwd(true); setIsOpen(false); }}
+          className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all cursor-pointer text-left"
+        >
+          <KeyRound className="h-5 w-5" />
+          <span className="text-sm font-semibold">Changer le mot de passe</span>
+        </button>
+
+        <button
           onClick={handleLogout}
           className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-rose-500 hover:text-rose-400 hover:bg-rose-950/20 transition-all group cursor-pointer text-left"
         >
@@ -139,6 +176,90 @@ export default function AdminSidebar() {
       <aside className="hidden md:block w-72 h-screen sticky top-0 flex-shrink-0 z-30 overflow-y-auto">
         <SidebarContent />
       </aside>
+
+      {/* Change password modal */}
+      {showChangePwd && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-violet-100 dark:bg-violet-950/40 rounded-xl">
+                  <KeyRound className="h-5 w-5 text-violet-600" />
+                </div>
+                <h3 className="font-bold text-slate-900 dark:text-white">Changer le mot de passe</h3>
+              </div>
+              <button
+                onClick={() => { setShowChangePwd(false); setPwdForm({ current: '', next: '', confirm: '' }); }}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer text-lg leading-none"
+              >✕</button>
+            </div>
+
+            <form onSubmit={handleChangePwd} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Mot de passe actuel</label>
+                <div className="relative">
+                  <input
+                    required
+                    type={showCurrent ? 'text' : 'password'}
+                    value={pwdForm.current}
+                    onChange={(e) => setPwdForm(f => ({ ...f, current: e.target.value }))}
+                    className="w-full px-3 py-2 pr-10 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                    placeholder="Mot de passe actuel"
+                  />
+                  <button type="button" onClick={() => setShowCurrent(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+                    {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nouveau mot de passe</label>
+                <div className="relative">
+                  <input
+                    required
+                    type={showNext ? 'text' : 'password'}
+                    minLength={8}
+                    value={pwdForm.next}
+                    onChange={(e) => setPwdForm(f => ({ ...f, next: e.target.value }))}
+                    className="w-full px-3 py-2 pr-10 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                    placeholder="Min. 8 caractères"
+                  />
+                  <button type="button" onClick={() => setShowNext(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+                    {showNext ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Confirmer le mot de passe</label>
+                <input
+                  required
+                  type="password"
+                  minLength={8}
+                  value={pwdForm.confirm}
+                  onChange={(e) => setPwdForm(f => ({ ...f, confirm: e.target.value }))}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                  placeholder="Répéter le nouveau mot de passe"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button type="button"
+                  onClick={() => { setShowChangePwd(false); setPwdForm({ current: '', next: '', confirm: '' }); }}
+                  className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-xl text-sm transition-colors cursor-pointer">
+                  Annuler
+                </button>
+                <button type="submit" disabled={changePwdMutation.isPending}
+                  className="flex-1 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-60 text-white font-semibold rounded-xl text-sm transition-colors cursor-pointer">
+                  {changePwdMutation.isPending ? 'Enregistrement…' : 'Modifier'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

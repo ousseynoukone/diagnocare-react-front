@@ -85,6 +85,18 @@ export function ResetPasswordConfirmRequest(resetData: ResetPasswordDTO) {
         });
 }
 
+// Super Admin force-resets another user's password (no current password needed)
+export function AdminSetPasswordRequest(userId: number, newPassword: string) {
+    return apiClient.put(`/auth/admin/users/${userId}/set-password`, { newPassword })
+        .then(r => r.data);
+}
+
+// Authenticated user changes their own password (current password required)
+export function ChangePasswordRequest(userId: number, currentPassword: string, newPassword: string) {
+    return apiClient.put(`/auth/users/${userId}/change-password`, { currentPassword, newPassword })
+        .then(r => r.data);
+}
+
 // Logout — asks the server to clear the HttpOnly cookies
 export function LogoutRequest() {
     return apiClient.post('/auth/logout', {})

@@ -189,3 +189,16 @@ export function getKnownSettings(): Promise<SettingDescriptorDTO[]> {
 export function updateSetting(key: string, value: string): Promise<string> {
   return apiClient.put(`/settings/${key}`, { value }).then((r) => r.data.data ?? r.data);
 }
+
+// ── Admin account creation (SUPER_ADMIN only) ─────────────────────────────────
+export interface AdminCreateAccountDTO {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  roleId: number;
+}
+
+export function createAdminAccount(dto: AdminCreateAccountDTO): Promise<AdminUserDTO> {
+  return apiClient.post('/auth/admin-register', dto).then((r) => r.data.data ?? r.data);
+}
