@@ -1,68 +1,116 @@
-# 🩺 Diagnocare – React Frontend Client
+# Diagnocare – Interface Web React
 
-A responsive, high-performance web interface built for the Diagnocare Healthcare platform.
-
----
-
-## 🛠️ Technology Stack
-
-* **Core Framework:** React 19 (Functional Components, Hooks)
-* **Build System:** Vite (Fast Refresh / HMR)
-* **Language:** TypeScript (Type-safe models and API integration)
-* **Styling:** Tailwind CSS v4 (Modern utility-first styling) & Vanilla CSS overrides
-* **Icons:** Lucide React
-* **State Management:** Zustand (Persisted stores)
-* **Data Fetching:** TanStack React Query (Automatic caching and mutation state)
-* **Form Handling:** React Hook Form
-* **HTTP Client:** Axios (With interceptors and credentials support)
+Interface web réactive et performante du projet Diagnocare, une plateforme de santé intelligente permettant aux patients de soumettre leurs symptômes, de consulter des prédictions de maladies, de prendre des rendez-vous et de gérer leur profil médical.
 
 ---
 
-## 🔐 Cookie-Based Authentication Integration
+## Stack Technique
 
-To guard against Cross-Site Scripting (XSS) tokens are not stored in local storage or read by JavaScript. Instead, the application relies entirely on secure **HttpOnly cookies** issued by the backend gateway.
-
-### Key Implementation Details:
-
-1. **Axios Client Configuration (`AxiosApiClient.tsx`):**
-   * The global `apiClient` instance has `withCredentials: true` enabled.
-   * This forces the browser to automatically attach local cookies (such as `token` and `refreshToken`) to outgoing API requests and save new cookies sent by `Set-Cookie` response headers.
-
-2. **State Management (`UserStore.ts`):**
-   * Local storage is only used to persist user profile metadata (e.g. name, email, roles) in the `diagnocare-user` store for rendering UI elements.
-   * Authentication secrets (JWTs) remain hidden from JavaScript.
-   * Triggering `logout()` sends a request to the backend `/auth/logout` endpoint which prompts the browser to clear the HttpOnly cookies, and then resets local UI states.
-
-3. **Interceptor Refresh Mechanism:**
-   * If an API request fails with a `401 Unauthorized` status (due to an expired access token), the interceptor catches it.
-   * It attempts to hit `/auth/refresh-token` in the background (which succeeds if the long-lived `refreshToken` cookie is valid).
-   * Once refreshed, it automatically retries the failed request, preventing session disruption.
+| Catégorie | Technologie |
+| :--- | :--- |
+| Framework principal | React 19 (Composants fonctionnels, Hooks) |
+| Système de build | Vite 8 (HMR / Fast Refresh) |
+| Langage | TypeScript 6 |
+| Style | Tailwind CSS v4 + CSS personnalisé |
+| Icônes | Lucide React |
+| Gestion d'état | Zustand 5 (stores persistés) |
+| Requêtes API | TanStack React Query 5 (cache, mutations) |
+| Formulaires | React Hook Form 7 |
+| Client HTTP | Axios (intercepteurs, credentials) |
+| Routage | React Router DOM v7 |
+| Internationalisation | i18next + react-i18next (FR / EN) |
+| Cartographie | Leaflet + React Leaflet |
+| Notifications | Sonner |
 
 ---
 
-## ⚙️ Running Locally
+## Authentification par Cookies HttpOnly
 
-### 🐳 Prerequisites
-Ensure you have Node.js (v18+) and npm installed.
+Pour protéger contre les attaques XSS, **les tokens JWT ne sont jamais stockés dans le localStorage ni accessibles par JavaScript**. L'application s'appuie intégralement sur les **cookies HttpOnly** émis par la passerelle backend.
 
-### 🚀 Get Started
+### Détails d'implémentation
 
-1. Install dependencies:
+1. **Client Axios (`AxiosApiClient.ts`)**
+   - L'instance globale `apiClient` est configurée avec `withCredentials: true`.
+   - Cela force le navigateur à joindre automatiquement les cookies (`token`, `refreshToken`) à chaque requête sortante, et à sauvegarder les cookies reçus via `Set-Cookie`.
+
+2. **Store utilisateur (`UserStore.ts`)**
+   - Le localStorage ne stocke que les métadonnées du profil (nom, e-mail, rôles) dans le store `diagnocare-user`, utilisées uniquement pour l'affichage.
+   - Les secrets d'authentification restent cachés au JavaScript.
+   - L'appel à `logout()` déclenche une requête vers `/auth/logout` (qui invalide les cookies côté serveur), puis réinitialise l'état local de l'interface.
+
+3. **Mécanisme de rafraîchissement automatique**
+   - Si une requête API échoue avec un statut `401 Unauthorized` (token expiré), l'intercepteur Axios le détecte.
+   - Il tente automatiquement un appel vers `/auth/refresh-token` (qui réussit si le cookie `refreshToken` est encore valide).
+   - Une fois le token rafraîchi, la requête initiale est automatiquement rejouée sans interruption pour l'utilisateur.
+
+---
+
+## Lancement en local
+
+### Prérequis
+
+- Node.js v18 ou supérieur
+- npm ou bun
+
+### Démarrage rapide
+
+1. Installer les dépendances :
    ```bash
    npm install
    ```
 
-2. Create a `.env` file in the root directory:
+2. Créer un fichier `.env` à la racine du projet :
    ```env
    VITE_API_BASE_URL=http://localhost:8765/api/v1
    ```
 
-3. Spin up the Vite development server:
+3. Lancer le serveur de développement :
    ```bash
    npm run dev
    ```
 
-4. Build for production:
+4. Construire pour la production :
    ```bash
    npm run build
    ```
+
+5. Prévisualiser le build de production :
+   ```bash
+   npm run preview
+   ```
+
+---
+
+## Structure du projet
+
+```
+diagnocare-react-front/
+├── src/
+│   ├── api-s/              # Client Axios, services et requêtes API
+│   ├── assets/             # Images et logos
+│   ├── components/         # Composants réutilisables (admin, dashboard, partagés…)
+│   ├── hooks/              # Hooks personnalisés (auth, profil, symptômes, rapports…)
+│   ├── layouts/            # Layouts de page (public, auth, dashboard, admin)
+│   ├── locales/            # Fichiers de traduction (fr.json, en.json)
+│   ├── pages/              # Pages de l'application (auth, dashboard, admin, légal…)
+│   ├── store/              # Stores Zustand (UserStore, EvaluationStore)
+│   ├── types/              # Types TypeScript et modèles de données
+│   └── utils/              # Fonctions utilitaires
+├── public/                 # Fichiers statiques publics
+├── index.html              # Point d'entrée HTML
+├── vite.config.ts          # Configuration Vite
+├── Dockerfile              # Image Docker de production (Nginx)
+└── nginx.conf              # Configuration du serveur Nginx
+```
+
+---
+
+## Déploiement avec Docker
+
+L'application est packagée en une image Docker multi-étapes : Vite génère un build statique optimisé, puis Nginx le sert.
+
+```bash
+docker build -t diagnocare-front .
+docker run -p 80:80 diagnocare-front
+```
