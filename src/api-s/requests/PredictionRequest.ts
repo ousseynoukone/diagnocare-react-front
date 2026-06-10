@@ -44,6 +44,17 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
   const predictions = await getPredictionsByUserId(userId);
   if (!predictions || predictions.length === 0) return [];
 
+  // Build a symptom translation map once for all predictions: { [english_id]: translated_label }
+  let symptomTranslationMap: Record<string, string> = {};
+  try {
+    const metaResponse = await apiClient.get('/symptoms/ml-metadata');
+    const meta = metaResponse.data.data ?? metaResponse.data;
+    const langArray: Array<{ id: string; label: string }> = meta?.symptoms?.[lang] ?? meta?.symptoms?.fr ?? [];
+    symptomTranslationMap = Object.fromEntries(langArray.map((s) => [s.id, s.label]));
+  } catch {
+    // Non-blocking: fall back to raw labels if metadata fetch fails
+  }
+
   const hydrated = await Promise.all(
     predictions.map(async (pred) => {
       try {
@@ -60,7 +71,9 @@ export async function getDetailedPredictionsByUser(userId: number, lang: string 
           : null;
 
         const symptomsList = sessionSymptom && Array.isArray(sessionSymptom.symptoms)
-          ? sessionSymptom.symptoms.map((s: any) => s.label).join(', ')
+          ? sessionSymptom.symptoms
+              .map((s: any) => symptomTranslationMap[s.label] ?? s.label)
+              .join(', ')
           : '';
 
         // Scale bestScore from decimal (e.g. 0.88) to percentage (88)
